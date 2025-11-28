@@ -75,7 +75,7 @@ fun AppTopBar(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if (topBarInfo.trailingIcons.isEmpty()) {
-                Spacer(modifier = Modifier.padding(start = 48.dp))
+                Spacer(modifier = Modifier.padding(24.dp))
             } else {
                 topBarInfo.trailingIcons.forEach { (icon, onClick) ->
                     TopBarIcon(
