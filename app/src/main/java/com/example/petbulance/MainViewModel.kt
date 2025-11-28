@@ -17,7 +17,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     val appTheme: StateFlow<AppTheme> = getThemeUseCase()
         .map { result ->
-            result.getOrDefault(AppTheme.DEVICE)
+            result.getOrDefault(AppTheme.DAYLIGHT)
         }
         .stateIn(
             scope = viewModelScope,

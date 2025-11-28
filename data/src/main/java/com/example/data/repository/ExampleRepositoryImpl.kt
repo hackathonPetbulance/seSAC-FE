@@ -1,4 +1,4 @@
-package com.example.data.remote.local.repository
+package com.example.data.repository
 
 import com.example.data.common.toEntity
 import com.example.data.remote.local.database.dao.ExampleDao

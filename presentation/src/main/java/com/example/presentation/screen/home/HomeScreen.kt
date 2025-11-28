@@ -1,14 +1,28 @@
 package com.example.presentation.screen.home
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.NotificationsNone
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,16 +32,37 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.domain.model.feature.hospitals.HospitalCard
+import com.example.domain.model.feature.reviews.HospitalReview
+import com.example.domain.model.type.AnimalCategory
+import com.example.domain.model.type.toKorean
 import com.example.presentation.component.theme.PetbulanceTheme
+import com.example.presentation.component.theme.PetbulanceTheme.colorScheme
+import com.example.presentation.component.theme.emp
+import com.example.presentation.component.ui.CommonPadding
+import com.example.presentation.component.ui.Dot
+import com.example.presentation.component.ui.atom.BasicButton
+import com.example.presentation.component.ui.atom.BasicIcon
+import com.example.presentation.component.ui.atom.BasicSelectableChip
+import com.example.presentation.component.ui.atom.ButtonType
 import com.example.presentation.component.ui.atom.IconResource
+import com.example.presentation.component.ui.molecule.HospitalCard
 import com.example.presentation.component.ui.organism.AppTopBar
-import com.example.presentation.component.ui.organism.BottomNavigationBar
-import com.example.presentation.component.ui.organism.CurrentBottomNav
+import com.example.presentation.component.ui.organism.TopBarAlignment
 import com.example.presentation.component.ui.organism.TopBarInfo
 import com.example.presentation.utils.error.ErrorDialog
 import com.example.presentation.utils.error.ErrorDialogState
@@ -35,6 +70,7 @@ import com.example.presentation.utils.nav.ScreenDestinations
 import com.example.presentation.utils.nav.safeNavigate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
@@ -43,7 +79,14 @@ fun HomeScreen(
     data: HomeData
 ) {
     var errorDialogState by remember { mutableStateOf(ErrorDialogState.idle()) }
-    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
+    var currentSelectedAnimalCategory by remember { mutableStateOf(AnimalCategory.SMALL_MAMMAL) }
+    val onReviewCategoryChipClicked = { animalCategory: AnimalCategory ->
+        currentSelectedAnimalCategory = animalCategory
+    }
+
+    val hospitalCards = data.hospitalCards
+    val hospitalReviews = data.hospitalReviews
 
     LaunchedEffect(argument.event) {
         argument.event.collect { event ->
@@ -57,26 +100,25 @@ fun HomeScreen(
         topBar = {
             AppTopBar(
                 topBarInfo = TopBarInfo(
-                    text = "Home",
+                    text = "펫뷸런스",
+                    textAlignment = TopBarAlignment.START,
+                    shouldEmphasized = true,
                     isLeadingIconAvailable = false,
-                    onLeadingIconClicked = {},
-                    leadingIconResource = IconResource.Vector(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                    isTrailingIconAvailable = false,
-                    onTrailingIconClicked = {},
-                    trailingIconResource = IconResource.Vector(Icons.Filled.MoreVert)
+                    isTrailingIconAvailable = true,
+                    trailingIcons = listOf(Pair(IconResource.Vector(Icons.Filled.NotificationsNone)) {
+                        /* TODO : do sth */
+                    })
                 ),
             )
         },
-        bottomBar = {
-            BottomNavigationBar(
-                selectedItem = CurrentBottomNav.HOME,
-                navController = navController
-            )
-        },
+        containerColor = colorScheme.bgFrameDefault
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             HomeScreenContents(
-
+                hospitalCards = hospitalCards,
+                hospitalReviews = hospitalReviews,
+                currentSelectedAnimalCategory = currentSelectedAnimalCategory,
+                onReviewCategoryChipClicked = onReviewCategoryChipClicked,
             )
         }
     }
@@ -85,30 +127,259 @@ fun HomeScreen(
         ErrorDialog(
             errorDialogState = errorDialogState,
             errorHandler = {
-                errorDialogState = errorDialogState.toggleVisibility()
+                errorDialogState.toggleVisibility()
                 navController.safeNavigate(ScreenDestinations.Home.route)
             }
         )
     }
 
-    // BackHandler {  }
+    BackHandler { }
 }
 
 @Composable
 private fun HomeScreenContents(
-
+    hospitalCards: List<HospitalCard>,
+    hospitalReviews: List<HospitalReview>,
+    currentSelectedAnimalCategory: AnimalCategory,
+    onReviewCategoryChipClicked: (AnimalCategory) -> Unit
 ) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceAround
+            .fillMaxWidth()
+            .padding(CommonPadding),
+        verticalArrangement = Arrangement.spacedBy(CommonPadding)
     ) {
-        Text("text")
+        StartAiReportCard()
 
+        NearByHospitalCards(hospitalCards)
+
+        HospitalReviews(
+            hospitalReviews = hospitalReviews,
+            currentSelectedAnimalCategory = currentSelectedAnimalCategory,
+            onReviewCategoryChipClicked = onReviewCategoryChipClicked,
+        )
     }
 }
 
+@Composable
+private fun StartAiReportCard() {
+    val gradientColors = listOf(
+        Color(0xFF1C334B).copy(alpha = 0.15f),
+        Color(0xFFEF2A2A).copy(alpha = 0.30f)
+    )
+
+    val brush = Brush.linearGradient(
+        colors = gradientColors,
+        start = Offset(0f, 0f), // 왼쪽 (X=0, Y=0)
+        end = Offset(1000f, 0f) // 오른쪽 (X는 임의의 큰 값, Y=0)
+    )
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .background(brush, RoundedCornerShape(20.dp))
+            .padding(16.dp)
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Color(0xFFEF4343),
+                        shape = RoundedCornerShape(1000.dp)
+                    )
+                    .padding(4.dp)
+            ) {
+                Text(
+                    "SOS",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W700),
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val description = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(color = Color(0xFF0E2647), fontWeight = FontWeight.W400)
+                    ) {
+                        append("아이의 현재 상태를 촬영하면\n")
+                    }
+                    withStyle(
+                        style = SpanStyle(
+                            color = colorScheme.warningText,
+                            fontWeight = FontWeight.W600
+                        )
+                    ) {
+                        append("펫뷸런스 AI")
+                    }
+                    withStyle(
+                        style = SpanStyle(color = Color(0xFF0E2647), fontWeight = FontWeight.W400)
+                    ) {
+                        append("가 응급도를 판별하여 진료중인 병원을 안내하고 응급처치 가이드를 제공합니다.")
+                    }
+                }
+
+                Text(
+                    "응급 상황인가요?",
+                    style = MaterialTheme.typography.titleSmall.emp(),
+                    color = colorScheme.textSecondary
+                )
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+        BasicButton(
+            text = "AI 응급 분석 시작하기",
+            type = ButtonType.EMERGENCY,
+            onClicked = {/* TODO : Navigate to diagnosis Screen */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(8.dp))
+        )
+    }
+}
+
+@Composable
+private fun NearByHospitalCards(
+    hospitalCards: List<HospitalCard>
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "내 주변 진료중인 병원",
+            style = MaterialTheme.typography.titleSmall.emp(),
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
+        hospitalCards.forEach { hospital ->
+            HospitalCard(hospital)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun HospitalReviews(
+    hospitalReviews: List<HospitalReview>,
+    currentSelectedAnimalCategory: AnimalCategory,
+    onReviewCategoryChipClicked: (AnimalCategory) -> Unit
+) {
+    val listState = rememberLazyListState()
+    val snapBehavior = rememberSnapFlingBehavior(lazyListState = listState)
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "병원 진료 후기",
+            style = MaterialTheme.typography.titleSmall.emp(),
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        ) {
+            AnimalCategory.entries.forEach { elem ->
+                BasicSelectableChip(
+                    text = elem.toKorean(),
+                    isSelected = (currentSelectedAnimalCategory.name == elem.name),
+                    onClicked = { onReviewCategoryChipClicked(elem) }
+                )
+            }
+        }
+
+        LazyRow(
+            state = listState,
+            flingBehavior = snapBehavior,
+            contentPadding = PaddingValues(horizontal = 0.dp),
+        ) {
+            items(hospitalReviews) { elem ->
+                HospitalReviewCarouselCard(
+                    modifier = Modifier.fillParentMaxWidth(),
+                    review = elem
+                )
+            }
+        }
+    }
+}
+// 병원 후기에서는 페이징 없음 -> 필터링 된 결과 그냥 그대로 던져줌
+
+@Composable
+private fun HospitalReviewCarouselCard(
+    modifier: Modifier = Modifier,
+    review: HospitalReview
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .background(color = colorScheme.bgFrameDefault, shape = RoundedCornerShape(16.dp))
+            .border(1.dp, color = Color.LightGray, RoundedCornerShape(16.dp))
+            .padding(16.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = review.title,
+                style = MaterialTheme.typography.titleSmall.emp(),
+                color = colorScheme.reviewTextColor
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicIcon(
+                    iconResource = IconResource.Vector(Icons.Outlined.CalendarToday),
+                    contentDescription = "calendarToday",
+                    size = 16.dp,
+                    tint = colorScheme.caption2,
+                )
+                Text(
+                    text = review.createdAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")),
+                    style = MaterialTheme.typography.bodySmall.emp(),
+                    color = colorScheme.caption2
+                )
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = review.hospitalName,
+                style = MaterialTheme.typography.bodySmall.emp(),
+                color = colorScheme.caption2
+            )
+            Dot(colorScheme.caption2, 1.dp)
+            Text(
+                text = review.animalCategory.toKorean(),
+                style = MaterialTheme.typography.bodySmall.emp(),
+                color = colorScheme.caption2
+            )
+        }
+
+        Text(
+            text = review.content.take(150),
+            style = MaterialTheme.typography.bodySmall.emp(),
+            color = colorScheme.reviewTextColor,
+            softWrap = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
 
 @Preview
 @Composable
@@ -121,9 +392,7 @@ private fun HomeScreenPreview() {
                 state = HomeState.Init,
                 event = MutableSharedFlow()
             ),
-            data = HomeData(
-                data = ""
-            )
+            data = HomeData.stub()
         )
     }
 }

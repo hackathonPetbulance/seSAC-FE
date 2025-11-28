@@ -1,5 +1,6 @@
 package com.example.presentation.component.theme
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -19,64 +20,76 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+private val primary = Color(0xFF2DA969)
+
 private val LightColorPalette = PetbulanceColorScheme(
-    primary = Color(0xFF222051),
+    isDark = false,
+
     lightPrimary = Color(0xFF8B87EA),
     secondary = Color(0xFF637387),
     commonText = Color(0xFF000000),
     descriptionText = Color(0xFF637387),
-    warningText = Color(0xFFD32F2F),
-    iconTint = Color(0xFF000000),
+    iconTint = Color(0xFF424242),
     inactivatedIconColor = Color(0xFFBCBCBC),
     inactivatedTextColor = Color(0xFF555555),
     bottomNavIconTint = Color(0xFF637387),
     surface = Color(0xFFFEFEFE),
     background = Color(0xFFF3F4F6),
-    primaryButtonColor = Color(0xFF222051),
+
+    primaryButtonColor = primary,
     onPrimaryButtonColor = Color(0xFFFFFFFF),
-    secondaryButtonColor = Color(0xFF637387),
-    onSecondaryButtonColor = Color(0xFFFFFFFF),
-    isDark = false
+    secondaryButtonColor = Color(0xFFFFFFFF),
+    onSecondaryButtonColor = primary,
+
+    primary = Color(0xFF2DA969),
+    textPrimary = Color(0xFF1E1E1E),
+    textTertiary = Color(0xFF424242),
+    reviewTextColor = Color(0xFF143048),
+
+    bgFrameDefault = Color(0xFFFFFFFF),
+    defaultIcon = Color(0XFF424242),
+
+    warningText = Color(0xFFEF4343),
+    textSecondary = Color(0xFF212121),
+
+    caption = Color(0xFF9E9E9E),
+    caption2 = Color(0xFF65758B)
 )
 
-private val DarkColorPalette = PetbulanceColorScheme(
-    primary = Color(0xFF5A57C9),
-    lightPrimary = Color(0xFF8B87EA),
-    secondary = Color(0xFFB0BEC5),
-    commonText = Color(0xFFF0F0F0),
-    descriptionText = Color(0xFF90A4AE),
-    warningText = Color(0xFFFF6659),
-    iconTint = Color(0xFFF0F0F0),
-    inactivatedIconColor = Color(0xFF555555),
-    inactivatedTextColor = Color(0xFFBCBCBC),
-    bottomNavIconTint = Color(0xFFB0BEC5),
-    surface = Color(0xFF2C2C3A),
-    background = Color(0xFF1A1A24),
-    primaryButtonColor = Color(0xFF5A57C9),
-    onPrimaryButtonColor = Color(0xFFF0F0F0),
-    secondaryButtonColor = Color(0xFFB0BEC5),
-    onSecondaryButtonColor = Color(0xFF000000),
-    isDark = true
-)
+private val DarkColorPalette = LightColorPalette.copy(isDark = true)
 
-class PetbulanceColorScheme(
-    var primary: Color,
+data class PetbulanceColorScheme(
+    val isDark: Boolean,
+
     var lightPrimary: Color,
     var secondary: Color,
     var commonText: Color,
     var descriptionText: Color,
-    var warningText: Color,
     var iconTint: Color,
     var inactivatedIconColor: Color,
     var inactivatedTextColor: Color,
     var bottomNavIconTint: Color,
     var surface: Color,
     var background: Color,
+
     var primaryButtonColor: Color,
     var onPrimaryButtonColor: Color,
     var secondaryButtonColor: Color,
     var onSecondaryButtonColor: Color,
-    val isDark: Boolean
+
+
+    var primary: Color,
+    var textPrimary: Color,
+    var textSecondary: Color,
+    var textTertiary: Color,
+    var reviewTextColor: Color,
+
+    var caption: Color,
+    var caption2: Color,
+
+    var defaultIcon: Color,
+    var bgFrameDefault: Color,
+    var warningText: Color,
 )
 
 val LocalPetbulanceColorScheme = staticCompositionLocalOf { LightColorPalette }
@@ -91,7 +104,7 @@ fun getPetbulanceColorScheme(darkTheme: Boolean = false): PetbulanceColorScheme 
     name = "Dark Color Palette",
     showBackground = true,
     widthDp = 300,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 private fun ColorPalettePreview() {

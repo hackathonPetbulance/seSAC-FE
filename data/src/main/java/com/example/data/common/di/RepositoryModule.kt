@@ -1,8 +1,11 @@
 package com.example.data.common.di
 
 import com.example.data.remote.local.preference.PreferenceRepositoryImpl
-import com.example.data.remote.local.repository.ExampleRepositoryImpl
+import com.example.data.repository.ExampleRepositoryImpl
+import com.example.data.repository.feature.hospital.HospitalRepositoryImpl
+import com.example.data.repository.feature.hospital.MockHospitalRepository
 import com.example.domain.repository.feature.ExampleRepository
+import com.example.domain.repository.feature.hospital.HospitalRepository
 import com.example.domain.usecase.nonfeature.preference.PreferenceRepository
 import dagger.Binds
 import dagger.Module
@@ -26,4 +29,9 @@ abstract class RepositoryModule {
         impl: PreferenceRepositoryImpl
     ): PreferenceRepository
 
+    @Binds
+    abstract fun bindHospitalRepository(
+        mock: MockHospitalRepository
+//        impl: HospitalRepositoryImpl
+    ): HospitalRepository
 }

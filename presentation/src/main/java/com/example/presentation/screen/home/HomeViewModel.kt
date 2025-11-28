@@ -1,6 +1,8 @@
 package com.example.presentation.screen.home
 
-import androidx.lifecycle.SavedStateHandle
+import com.example.domain.model.feature.hospitals.HospitalCard
+import com.example.domain.model.feature.reviews.HospitalReview
+import com.example.domain.usecase.feature.hospital.GetNearByHospitalUseCase
 import com.example.presentation.utils.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,8 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
-    // private val someUseCase: SomeUseCase
+    private val getNearByHospitalUseCase: GetNearByHospitalUseCase
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow<HomeState>(HomeState.Init)
@@ -21,8 +22,12 @@ class HomeViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<HomeEvent>()
     val eventFlow: SharedFlow<HomeEvent> = _eventFlow
 
-    private val _someData = MutableStateFlow("")
-    val someData: StateFlow<String> = _someData
+    private val _hospitalCards = MutableStateFlow(emptyList<HospitalCard>())
+    val hospitalCards: StateFlow<List<HospitalCard>> = _hospitalCards
+
+    private val _hospitalReviews = MutableStateFlow(emptyList<HospitalReview>())
+    val hospitalReviews: StateFlow<List<HospitalReview>> = _hospitalReviews
+
 
     fun onIntent(intent: HomeIntent) {
         when (intent) {
@@ -38,27 +43,25 @@ class HomeViewModel @Inject constructor(
 
     init {
         launch {
-
+            getNearByHospital()
         }
     }
 
-    // some function
-    private suspend fun someFunction() {
+    private suspend fun getNearByHospital() {
         _state.value = HomeState.OnProgress
-
         runCatching {
-            // someUseCase()
+            getNearByHospitalUseCase()
         }.onSuccess { result ->
-            // some.value = result.getOrThrow()
-        }.onFailure { exception ->
-            // some.value = emptyList()
+            _hospitalCards.value = result.getOrThrow()
+        }.onFailure { ex ->
             _eventFlow.emit(
                 HomeEvent.DataFetch.Error(
-                    userMessage = "Error messages to be shown to users",
-                    exceptionMessage = exception.message
+                    userMessage = "근처 병원 조회에 실패했어요.",
+                    exceptionMessage = ex.message
                 )
             )
         }
         _state.value = HomeState.Init
     }
+
 }

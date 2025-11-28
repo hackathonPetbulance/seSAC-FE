@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.presentation.screen.diagnosis.diagnosisDestination
 import com.example.presentation.screen.home.homeDestination
+import com.example.presentation.screen.hospital.hospitalDestination
+import com.example.presentation.screen.report.reportDestination
 import com.example.presentation.utils.nav.ScreenDestinations
 
 @Composable
@@ -18,5 +21,8 @@ fun AppNavGraph(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         homeDestination(navController = navController)
+        diagnosisDestination(navController = navController)
+        reportDestination(navController = navController)
+        hospitalDestination(navController = navController)
     }
 }

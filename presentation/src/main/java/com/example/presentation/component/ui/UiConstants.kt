@@ -1,10 +1,15 @@
 package com.example.presentation.component.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 // Spacer
@@ -23,3 +28,20 @@ fun Space16() {
 val SmallRoundedCorner = RoundedCornerShape(4.dp)
 val DefaultRoundedCorner = RoundedCornerShape(8.dp)
 val LargeRoundedCorner = RoundedCornerShape(16.dp)
+
+
+// Content Padding
+val CommonPadding = 20.dp
+
+
+// ???
+@Composable
+fun Dot(dotColor: Color = Color.Black, size: Dp = 4.dp ) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .background(dotColor, RoundedCornerShape(1000.dp))
+    ) {
+        Spacer(modifier = Modifier.size(1.dp))
+    }
+}

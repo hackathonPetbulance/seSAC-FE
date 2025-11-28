@@ -1,6 +1,7 @@
 package com.example.presentation.component.ui.atom
 
 import android.net.Uri
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -40,7 +42,9 @@ fun BasicImageBox(
     val dataToLoad = if (isUriValid) galleryUri else null
 
     Box(
-        modifier = modifier.size(size),
+        modifier = modifier
+            .size(size)
+            .border(1.dp, color = Color.Black),
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(

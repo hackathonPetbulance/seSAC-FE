@@ -1,4 +1,4 @@
-package com.example.presentation.screen.home
+package com.example.presentation.screen.report
 
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -8,36 +8,34 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.presentation.utils.nav.ScreenDestinations
 
-fun NavGraphBuilder.homeDestination(navController: NavController) {
+fun NavGraphBuilder.reportDestination(navController: NavController) {
     composable(
-        route = ScreenDestinations.Home.route
+        route = ScreenDestinations.Report.route,
+//        arguments = listOf(
+//            navArgument(name = "") {
+//                type = NavType.LongType
+//                defaultValue = 0L
+//            }
+//        ) -> if route contains arguments
     ) {
-        val viewModel: HomeViewModel = hiltViewModel()
+        val viewModel: ReportViewModel = hiltViewModel()
 
-        val argument: HomeArgument = let {
+        val argument: ReportArgument = let {
             val state by viewModel.state.collectAsStateWithLifecycle()
 
-            HomeArgument(
+            ReportArgument(
                 state = state,
                 intent = viewModel::onIntent,
                 event = viewModel.eventFlow
             )
         }
 
-        val data: HomeData = let {
+        val data: ReportData = let {
 
-            val hospitalCards by viewModel.hospitalCards.collectAsStateWithLifecycle()
-            val hospitalReviews by viewModel.hospitalReviews.collectAsStateWithLifecycle()
-
-            HomeData(
-                hospitalCards = hospitalCards,
-                hospitalReviews = hospitalReviews
-            )
-
-            HomeData.stub()
+            ReportData.empty()
         }
 
-        HomeScreen(
+        ReportScreen(
             navController = navController,
             argument = argument,
             data = data
