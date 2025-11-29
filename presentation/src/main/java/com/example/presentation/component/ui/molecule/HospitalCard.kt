@@ -87,6 +87,7 @@ private fun HospitalInfos(hospital: HospitalCard) {
         ) {
             Text(
                 text = hospital.name,
+                color = colorScheme.textPrimary,
                 style = MaterialTheme.typography.titleSmall.emp()
             )
             if (hospital.isOpenNow) {

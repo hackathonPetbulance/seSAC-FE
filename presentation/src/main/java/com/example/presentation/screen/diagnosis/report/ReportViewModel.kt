@@ -1,4 +1,4 @@
-package com.example.presentation.screen.report
+package com.example.presentation.screen.diagnosis.report
 
 import androidx.lifecycle.SavedStateHandle
 import com.example.presentation.utils.BaseViewModel

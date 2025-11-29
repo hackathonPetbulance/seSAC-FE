@@ -13,7 +13,7 @@ import javax.inject.Inject
 class HospitalApi @Inject constructor(
     private val client: HttpClient
 ) {
-    private val baseUrl = "${BASE_URL}/hospitals/matching"
+    private val baseUrl = "${BASE_URL}/hospitals/"
 
     suspend fun getMatchingHospitals(
         filter: HospitalFilterType,
@@ -21,7 +21,7 @@ class HospitalApi @Inject constructor(
         lat: Double,
         lng: Double
     ): HttpResponse {
-        return client.get(baseUrl) {
+        return client.get(baseUrl+"matching") {
             contentType(ContentType.Application.Json)
             parameter("filter", filter.name)
             species.forEach { parameter("species", it) }

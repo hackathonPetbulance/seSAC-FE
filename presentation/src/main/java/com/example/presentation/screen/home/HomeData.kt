@@ -10,7 +10,10 @@ data class HomeData(
     companion object {
         fun stub() = HomeData(
             hospitalCards = listOf(HospitalCard.stub()),
-            hospitalReviews = listOf(HospitalReview.stub())
+            hospitalReviews = listOf(
+                HospitalReview.stub(),
+                HospitalReview.stub().copy(reviewId = 2L)
+            )
         )
     }
 }

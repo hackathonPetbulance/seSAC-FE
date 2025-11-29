@@ -23,7 +23,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val TOLERABLE_TIME = 3000L
+    private const val TOLERABLE_TIME = 10_000L
 
     @Provides
     @Singleton

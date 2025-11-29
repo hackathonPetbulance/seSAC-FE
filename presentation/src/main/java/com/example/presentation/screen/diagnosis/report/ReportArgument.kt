@@ -1,4 +1,4 @@
-package com.example.presentation.screen.report
+package com.example.presentation.screen.diagnosis.report
 
 import com.example.presentation.utils.error.ErrorEvent
 import kotlinx.coroutines.flow.SharedFlow

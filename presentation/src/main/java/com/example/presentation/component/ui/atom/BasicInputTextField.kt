@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,7 +15,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +47,7 @@ fun BasicInputTextField(
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     placeholder: String = "placeholder",
     singleLine: Boolean = true,
+    sizeFactor: Int = 1,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     BasicTextField(
@@ -61,13 +62,15 @@ fun BasicInputTextField(
         cursorBrush = SolidColor(PetbulanceTheme.colorScheme.commonText),
         decorationBox = { innerTextField ->
             Row(
-                modifier = Modifier.fillMaxWidth().height(24.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((24 * sizeFactor).dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = if(singleLine) Alignment.CenterVertically else Alignment.Top
             ) {
                 Box(
                     modifier = Modifier,
-                    contentAlignment = Alignment.CenterStart
+                    contentAlignment = Alignment.TopStart
                 ) {
                     if (value.isEmpty()) {
                         Text(
@@ -77,16 +80,19 @@ fun BasicInputTextField(
                     }
                     innerTextField()
                 }
-                Icon(
-                    Icons.Default.Clear,
-                    contentDescription = "Clear all",
-                    tint = PetbulanceTheme.colorScheme.iconTint,
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clickable {
-                            onValueChange("")
-                        }
-                )
+                if (value.isNotEmpty()) {
+                    BasicIcon(
+                        iconResource = IconResource.Vector(Icons.Default.Clear),
+                        contentDescription = "Clear all",
+                        size = 16.dp,
+                        tint = PetbulanceTheme.colorScheme.iconTint,
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clickable {
+                                onValueChange("")
+                            }
+                    )
+                }
             }
         }
     )
@@ -95,5 +101,14 @@ fun BasicInputTextField(
 @Preview(apiLevel = 34)
 @Composable
 private fun BasicInputTextFieldPreview() {
-    BasicInputTextField(value = "", onValueChange = {}, placeholder = "Placeholder")
+    PetbulanceTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            BasicInputTextField(value = "", onValueChange = {}, placeholder = "Placeholder")
+            BasicInputTextField(value = "Hello", onValueChange = {}, placeholder = "Placeholder")
+            BasicInputTextField(value = "", onValueChange = {}, placeholder = "Multi line", singleLine = false, sizeFactor = 5)
+        }
+    }
 }

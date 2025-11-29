@@ -1,5 +1,6 @@
 package com.example.presentation.screen.diagnosis
 
+import android.net.Uri
 import com.example.presentation.utils.error.ErrorEvent
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -15,11 +16,16 @@ sealed class DiagnosisState {
 }
 
 sealed class DiagnosisIntent {
-    data class SomeIntentWithParams(val param: String) : DiagnosisIntent()
-    data object SomeIntentWithoutParams : DiagnosisIntent()
+    data class UpdateAnimalSpecies(val species: String) : DiagnosisIntent()
+    data class UpdateDescription(val description: String) : DiagnosisIntent()
+    data class UpdateImageUris(val uris: List<Uri>) : DiagnosisIntent()
+
+    data class RequestDiagnosis(val onUpload: (Long, Long) -> Unit) : DiagnosisIntent()
 }
 
+
 sealed class DiagnosisEvent {
+    data object RequestSuccess : DiagnosisEvent()
     sealed class DataFetch : DiagnosisEvent() {
         data class Error(
             override val userMessage: String = "문제가 발생했습니다.",

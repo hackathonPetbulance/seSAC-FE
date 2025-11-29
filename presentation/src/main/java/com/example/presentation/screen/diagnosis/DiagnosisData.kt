@@ -1,11 +1,17 @@
 package com.example.presentation.screen.diagnosis
 
+import android.net.Uri
+
 data class DiagnosisData(
-    val data: String
+    val imageUris: List<Uri>,
+    val animalSpecies: String,
+    val description: String
 ) {
     companion object {
         fun empty() = DiagnosisData(
-            data = ""
+            imageUris = emptyList(),
+            animalSpecies = "",
+            description = ""
         )
     }
 }

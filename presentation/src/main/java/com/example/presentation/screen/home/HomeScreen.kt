@@ -30,7 +30,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,7 +67,6 @@ import com.example.presentation.utils.error.ErrorDialog
 import com.example.presentation.utils.error.ErrorDialogState
 import com.example.presentation.utils.nav.ScreenDestinations
 import com.example.presentation.utils.nav.safeNavigate
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.time.format.DateTimeFormatter
 
@@ -115,6 +113,9 @@ fun HomeScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             HomeScreenContents(
+                onNavigateToDiagnosisScreen = {
+                    navController.safeNavigate(ScreenDestinations.Diagnosis.route)
+                },
                 hospitalCards = hospitalCards,
                 hospitalReviews = hospitalReviews,
                 currentSelectedAnimalCategory = currentSelectedAnimalCategory,
@@ -138,6 +139,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenContents(
+    onNavigateToDiagnosisScreen: () -> Unit,
     hospitalCards: List<HospitalCard>,
     hospitalReviews: List<HospitalReview>,
     currentSelectedAnimalCategory: AnimalCategory,
@@ -150,7 +152,7 @@ private fun HomeScreenContents(
             .padding(CommonPadding),
         verticalArrangement = Arrangement.spacedBy(CommonPadding)
     ) {
-        StartAiReportCard()
+        StartAiReportCard(onNavigateToDiagnosisScreen)
 
         NearByHospitalCards(hospitalCards)
 
@@ -163,7 +165,9 @@ private fun HomeScreenContents(
 }
 
 @Composable
-private fun StartAiReportCard() {
+private fun StartAiReportCard(
+    onButtonClicked: () -> Unit
+) {
     val gradientColors = listOf(
         Color(0xFF1C334B).copy(alpha = 0.15f),
         Color(0xFFEF2A2A).copy(alpha = 0.30f)
@@ -180,7 +184,7 @@ private fun StartAiReportCard() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .background(brush, RoundedCornerShape(20.dp))
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Box(
@@ -235,7 +239,7 @@ private fun StartAiReportCard() {
         BasicButton(
             text = "AI 응급 분석 시작하기",
             type = ButtonType.EMERGENCY,
-            onClicked = {/* TODO : Navigate to diagnosis Screen */ },
+            onClicked = onButtonClicked,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(8.dp))
@@ -253,6 +257,7 @@ private fun NearByHospitalCards(
     ) {
         Text(
             text = "내 주변 진료중인 병원",
+            color = colorScheme.textPrimary,
             style = MaterialTheme.typography.titleSmall.emp(),
             modifier = Modifier.padding(vertical = 4.dp)
         )
@@ -278,6 +283,7 @@ private fun HospitalReviews(
     ) {
         Text(
             text = "병원 진료 후기",
+            color = colorScheme.textPrimary,
             style = MaterialTheme.typography.titleSmall.emp(),
             modifier = Modifier.padding(vertical = 4.dp)
         )

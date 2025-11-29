@@ -48,13 +48,22 @@ fun PermissionHandler(
         return
     }
 
-    val permissionState = rememberPermissionState(permission = permission)
+    val permissionState = rememberPermissionState(
+        permission = permission,
+        onPermissionResult = { isGranted ->
+            if (isGranted) {
+                onPermissionGranted()
+            } else {
+                onPermissionDenied()
+            }
+        }
+    )
 
-    LaunchedEffect(key1 = permissionState.status) {
+    LaunchedEffect(Unit) {
         if (permissionState.status.isGranted) {
             onPermissionGranted()
         } else {
-            onPermissionDenied()
+            permissionState.launchPermissionRequest()
         }
     }
 }

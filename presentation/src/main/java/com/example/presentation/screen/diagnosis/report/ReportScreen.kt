@@ -1,4 +1,4 @@
-package com.example.presentation.screen.report
+package com.example.presentation.screen.diagnosis.report
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,7 +43,6 @@ fun ReportScreen(
     data: ReportData
 ) {
     var errorDialogState by remember { mutableStateOf(ErrorDialogState.idle()) }
-    val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(argument.event) {
         argument.event.collect { event ->
@@ -120,9 +118,7 @@ private fun ReportScreenPreview() {
                 state = ReportState.Init,
                 event = MutableSharedFlow()
             ),
-            data = ReportData(
-                data = ""
-            )
+            data = ReportData.empty()
         )
     }
 }
