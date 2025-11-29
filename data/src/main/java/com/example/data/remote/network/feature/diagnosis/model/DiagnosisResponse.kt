@@ -11,8 +11,18 @@ data class DiagnosisResponse(
 
 @Serializable
 data class DiagnosisData(
+    val animalType: String,
     val emergencyLevel: String,
     val detectedSymptoms: List<String>,
     val suspectedDisease: String,
-    val recommendedActions: List<String>
+    val totalSteps: Int,
+    val steps: List<FirstAidGuideContentResponse>,
+    val recommendedActions: List<String>,
+    val confidence: Float
+)
+
+@Serializable
+data class FirstAidGuideContentResponse(
+    val description: String,
+    val warning: String
 )

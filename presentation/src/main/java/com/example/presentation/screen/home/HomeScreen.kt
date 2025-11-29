@@ -1,9 +1,9 @@
 package com.example.presentation.screen.home
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -55,14 +57,17 @@ import com.example.presentation.component.theme.emp
 import com.example.presentation.component.ui.CommonPadding
 import com.example.presentation.component.ui.Dot
 import com.example.presentation.component.ui.atom.BasicButton
+import com.example.presentation.component.ui.atom.BasicCard
 import com.example.presentation.component.ui.atom.BasicIcon
 import com.example.presentation.component.ui.atom.BasicSelectableChip
 import com.example.presentation.component.ui.atom.ButtonType
 import com.example.presentation.component.ui.atom.IconResource
 import com.example.presentation.component.ui.molecule.HospitalCard
+import com.example.presentation.component.ui.molecule.PermissionRequiredCard
 import com.example.presentation.component.ui.organism.AppTopBar
 import com.example.presentation.component.ui.organism.TopBarAlignment
 import com.example.presentation.component.ui.organism.TopBarInfo
+import com.example.presentation.utils.PermissionHandler
 import com.example.presentation.utils.error.ErrorDialog
 import com.example.presentation.utils.error.ErrorDialogState
 import com.example.presentation.utils.nav.ScreenDestinations
@@ -76,7 +81,9 @@ fun HomeScreen(
     argument: HomeArgument,
     data: HomeData
 ) {
+    val context = LocalContext.current
     var errorDialogState by remember { mutableStateOf(ErrorDialogState.idle()) }
+    var hasLocationPermission by remember { mutableStateOf(true) }
 
     var currentSelectedAnimalCategory by remember { mutableStateOf(AnimalCategory.SMALL_MAMMAL) }
     val onReviewCategoryChipClicked = { animalCategory: AnimalCategory ->
@@ -85,6 +92,20 @@ fun HomeScreen(
 
     val hospitalCards = data.hospitalCards
     val hospitalReviews = data.hospitalReviews
+
+    if (!hasLocationPermission) {
+        PermissionHandler(
+            permission = android.Manifest.permission.ACCESS_FINE_LOCATION,
+            onPermissionGranted = { hasLocationPermission = true },
+            onPermissionDenied = {
+                Toast.makeText(context, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    LaunchedEffect(hasLocationPermission) {
+        if (hasLocationPermission) argument.intent(HomeIntent.GetNearByHospital)
+    }
 
     LaunchedEffect(argument.event) {
         argument.event.collect { event ->
@@ -113,13 +134,14 @@ fun HomeScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             HomeScreenContents(
-                onNavigateToDiagnosisScreen = {
-                    navController.safeNavigate(ScreenDestinations.Diagnosis.route)
-                },
+                hasLocationPermission = hasLocationPermission,
                 hospitalCards = hospitalCards,
                 hospitalReviews = hospitalReviews,
                 currentSelectedAnimalCategory = currentSelectedAnimalCategory,
                 onReviewCategoryChipClicked = onReviewCategoryChipClicked,
+                onNavigateToDiagnosisScreen = {
+                    navController.safeNavigate(ScreenDestinations.Diagnosis.route)
+                },
             )
         }
     }
@@ -139,10 +161,11 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenContents(
-    onNavigateToDiagnosisScreen: () -> Unit,
+    hasLocationPermission: Boolean,
     hospitalCards: List<HospitalCard>,
     hospitalReviews: List<HospitalReview>,
     currentSelectedAnimalCategory: AnimalCategory,
+    onNavigateToDiagnosisScreen: () -> Unit,
     onReviewCategoryChipClicked: (AnimalCategory) -> Unit
 ) {
     Column(
@@ -154,7 +177,7 @@ private fun HomeScreenContents(
     ) {
         StartAiReportCard(onNavigateToDiagnosisScreen)
 
-        NearByHospitalCards(hospitalCards)
+        NearByHospitalCards(hasLocationPermission, hospitalCards)
 
         HospitalReviews(
             hospitalReviews = hospitalReviews,
@@ -227,12 +250,12 @@ private fun StartAiReportCard(
 
                 Text(
                     "응급 상황인가요?",
-                    style = MaterialTheme.typography.titleSmall.emp(),
+                    style = typography.titleSmall.emp(),
                     color = colorScheme.textSecondary
                 )
                 Text(
                     description,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = typography.bodyMedium
                 )
             }
         }
@@ -249,6 +272,7 @@ private fun StartAiReportCard(
 
 @Composable
 private fun NearByHospitalCards(
+    hasLocationPermission: Boolean,
     hospitalCards: List<HospitalCard>
 ) {
     Column(
@@ -258,11 +282,15 @@ private fun NearByHospitalCards(
         Text(
             text = "내 주변 진료중인 병원",
             color = colorScheme.textPrimary,
-            style = MaterialTheme.typography.titleSmall.emp(),
+            style = typography.titleSmall.emp(),
             modifier = Modifier.padding(vertical = 4.dp)
         )
-        hospitalCards.forEach { hospital ->
-            HospitalCard(hospital)
+        if (hasLocationPermission) {
+            hospitalCards.forEach { hospital ->
+                HospitalCard(hospital)
+            }
+        } else {
+            PermissionRequiredCard("위치 정보 수집 권한")
         }
     }
 }
@@ -284,7 +312,7 @@ private fun HospitalReviews(
         Text(
             text = "병원 진료 후기",
             color = colorScheme.textPrimary,
-            style = MaterialTheme.typography.titleSmall.emp(),
+            style = typography.titleSmall.emp(),
             modifier = Modifier.padding(vertical = 4.dp)
         )
 
@@ -325,13 +353,7 @@ private fun HospitalReviewCarouselCard(
     modifier: Modifier = Modifier,
     review: HospitalReview
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-            .background(color = colorScheme.bgFrameDefault, shape = RoundedCornerShape(16.dp))
-            .border(1.dp, color = Color.LightGray, RoundedCornerShape(16.dp))
-            .padding(16.dp)
-    ) {
+    BasicCard(modifier = modifier) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -339,7 +361,7 @@ private fun HospitalReviewCarouselCard(
         ) {
             Text(
                 text = review.title,
-                style = MaterialTheme.typography.titleSmall.emp(),
+                style = typography.run { titleSmall.emp() },
                 color = colorScheme.reviewTextColor
             )
             Row(
@@ -354,7 +376,7 @@ private fun HospitalReviewCarouselCard(
                 )
                 Text(
                     text = review.createdAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")),
-                    style = MaterialTheme.typography.bodySmall.emp(),
+                    style = typography.bodySmall.emp(),
                     color = colorScheme.caption2
                 )
             }
@@ -366,20 +388,20 @@ private fun HospitalReviewCarouselCard(
         ) {
             Text(
                 text = review.hospitalName,
-                style = MaterialTheme.typography.bodySmall.emp(),
+                style = typography.bodySmall.emp(),
                 color = colorScheme.caption2
             )
             Dot(colorScheme.caption2, 1.dp)
             Text(
                 text = review.animalCategory.toKorean(),
-                style = MaterialTheme.typography.bodySmall.emp(),
+                style = typography.bodySmall.emp(),
                 color = colorScheme.caption2
             )
         }
 
         Text(
             text = review.content.take(150),
-            style = MaterialTheme.typography.bodySmall.emp(),
+            style = typography.bodySmall.emp(),
             color = colorScheme.reviewTextColor,
             softWrap = true,
             modifier = Modifier.fillMaxWidth()

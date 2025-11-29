@@ -6,7 +6,7 @@ import com.example.domain.usecase.feature.hospital.HospitalFilterType
 interface HospitalRepository {
     suspend fun getMatchingHospitals(
         filter: HospitalFilterType,
-        species: List<String>,
+        species: String,
         lat: Double,
         lng: Double
     ): Result<List<HospitalCard>>

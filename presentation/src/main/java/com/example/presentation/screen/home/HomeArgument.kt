@@ -15,8 +15,7 @@ sealed class HomeState {
 }
 
 sealed class HomeIntent {
-    data class SomeIntentWithParams(val param: String) : HomeIntent()
-    data object SomeIntentWithoutParams : HomeIntent()
+    data object GetNearByHospital : HomeIntent()
 }
 
 sealed class HomeEvent {

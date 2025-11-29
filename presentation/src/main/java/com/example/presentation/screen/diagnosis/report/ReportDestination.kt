@@ -23,19 +23,22 @@ fun NavGraphBuilder.reportDestination(navController: NavController) {
         val diagnosisViewModel: DiagnosisViewModel = hiltViewModel(parentEntry)
         val reportViewModel: ReportViewModel = hiltViewModel()
 
-        val argument: ReportArgument = let {
-            ReportArgument(
-                state = reportViewModel.state.collectAsStateWithLifecycle().value,
-                intent = reportViewModel::onIntent,
-                event = reportViewModel.eventFlow
-            )
-        }
+        val argument = ReportArgument(
+            state = reportViewModel.state.collectAsStateWithLifecycle().value,
+            screenState = reportViewModel.screenState.collectAsStateWithLifecycle().value,
+            intent = reportViewModel::onIntent,
+            event = reportViewModel.eventFlow
+        )
 
         val data: ReportData = let {
             val aiDiagnosis by diagnosisViewModel.aiDiagnosis.collectAsStateWithLifecycle()
+            val userLocation by diagnosisViewModel.userLocation.collectAsStateWithLifecycle()
+            val matchedHospitals by diagnosisViewModel.matchedHospitals.collectAsStateWithLifecycle()
 
             ReportData(
-                aiDiagnosis = aiDiagnosis ?: AiDiagnosis.empty()
+                aiDiagnosis = aiDiagnosis ?: AiDiagnosis.empty(),
+                userLocation = userLocation,
+                matchedHospitals = matchedHospitals
             )
         }
 

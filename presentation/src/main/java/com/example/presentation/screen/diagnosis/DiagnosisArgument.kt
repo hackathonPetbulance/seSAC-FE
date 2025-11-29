@@ -18,7 +18,7 @@ sealed class DiagnosisState {
 sealed class DiagnosisIntent {
     data class UpdateAnimalSpecies(val species: String) : DiagnosisIntent()
     data class UpdateDescription(val description: String) : DiagnosisIntent()
-    data class UpdateImageUris(val uris: List<Uri>) : DiagnosisIntent()
+    data class UpdateImageUris(val uri: Uri?, val index: Int) : DiagnosisIntent()
 
     data class RequestDiagnosis(val onUpload: (Long, Long) -> Unit) : DiagnosisIntent()
 }

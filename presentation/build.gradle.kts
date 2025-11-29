@@ -81,6 +81,7 @@ dependencies {
 
     // Permissions
     implementation(libs.accompanist.permissions)
+    implementation(libs.play.services.location) // Location
 
     // Firebase & Auth
     implementation(platform(libs.firebase.bom))

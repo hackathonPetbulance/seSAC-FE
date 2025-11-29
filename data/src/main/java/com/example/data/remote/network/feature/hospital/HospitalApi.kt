@@ -17,7 +17,7 @@ class HospitalApi @Inject constructor(
 
     suspend fun getMatchingHospitals(
         filter: HospitalFilterType,
-        species: List<String>,
+        species: String,
         lat: Double,
         lng: Double
     ): HttpResponse {

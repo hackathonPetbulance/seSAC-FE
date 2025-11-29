@@ -1,6 +1,7 @@
 package com.example.presentation.component.ui.atom
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +55,7 @@ fun BasicInputTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
+            .border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
             .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 8.dp, vertical = 4.dp),
         textStyle = textStyle.copy(color = PetbulanceTheme.colorScheme.commonText),

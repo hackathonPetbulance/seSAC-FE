@@ -4,13 +4,13 @@ import com.example.domain.model.feature.hospitals.HospitalCard
 import com.example.domain.repository.feature.hospital.HospitalRepository
 import javax.inject.Inject
 
-class GetNearByHospitalUseCase @Inject constructor(
+class GetHospitalWithFilterUseCase @Inject constructor(
     private val repository: HospitalRepository
 ) {
-    suspend operator fun invoke(lat: Double, lng: Double): Result<List<HospitalCard>> {
+    suspend operator fun invoke(filter: HospitalFilterType, species: String, lat: Double, lng: Double): Result<List<HospitalCard>> {
         return repository.getMatchingHospitals(
-            filter = HospitalFilterType.DISTANCE,
-            species = "",
+            filter = filter,
+            species = species,
             lat = lat,
             lng = lng
         )

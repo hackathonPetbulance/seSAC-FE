@@ -14,6 +14,6 @@ fun ChipWithHospitalInfo(info: String) {
     }
     BasicChip(
         text = info,
-        color = chipBackgroundColor
+        backgroundColor = chipBackgroundColor
     )
 }

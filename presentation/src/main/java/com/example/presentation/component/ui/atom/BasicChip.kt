@@ -16,17 +16,18 @@ import com.example.presentation.component.theme.emp
 @Composable
 fun BasicChip(
     text: String,
-    color: Color
+    textColor: Color = colorScheme.textPrimary,
+    backgroundColor: Color
 ) {
     Box(
         modifier = Modifier
-            .background(color, RoundedCornerShape((20.dp)))
+            .background(backgroundColor, RoundedCornerShape((20.dp)))
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall.emp(),
-            color = colorScheme.textPrimary
+            color = textColor
         )
     }
 }

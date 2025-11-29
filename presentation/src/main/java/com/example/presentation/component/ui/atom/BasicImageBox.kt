@@ -1,12 +1,22 @@
 package com.example.presentation.component.ui.atom
 
 import android.net.Uri
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,7 +27,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.presentation.R
 
@@ -35,37 +44,53 @@ fun BasicImageBox(
     size: Dp = 128.dp,
     galleryUri: Uri?,
     errorImageResource: Int = R.drawable.broken_image,
-    placeholderImageResource: Int = R.drawable.broken_image /* TODO : placeholder 이미지 */
+    placeholderImageResource: Int = R.drawable.broken_image,
+    isClearable: Boolean = false,
+    onDeletionIconClicked: () -> Unit = {}
 ) {
-    val isUriValid = galleryUri != null && galleryUri.toString().isNotBlank()
-
-    val dataToLoad = if (isUriValid) galleryUri else null
+    var imageState by remember { mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty) }
 
     Box(
-        modifier = modifier
-            .size(size)
-            .border(1.dp, color = Color.Black),
+        modifier = modifier.size(size),
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(dataToLoad)
+                .data(galleryUri ?: placeholderImageResource)
                 .crossfade(true)
                 .error(errorImageResource)
                 .placeholder(placeholderImageResource)
                 .build(),
             modifier = Modifier
                 .matchParentSize()
-                .clip(RoundedCornerShape(4.dp)),
+                .clip(RoundedCornerShape(8.dp)),
             contentDescription = "이미지 콘텐츠",
             contentScale = ContentScale.Crop,
+            onState = { state ->
+                imageState = state
+            }
         )
 
-        val state = rememberAsyncImagePainter(model = dataToLoad).state
-        if (state is AsyncImagePainter.State.Loading) {
+        if (imageState is AsyncImagePainter.State.Loading) {
             CircularProgressIndicator()
         }
 
+        if (isClearable && imageState is AsyncImagePainter.State.Success) {
+            IconButton(
+                onClick = onDeletionIconClicked,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "Clear",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
     }
 }
 
@@ -75,7 +100,9 @@ fun BasicImageBox(
     size: Dp = 128.dp,
     imageResource: Int,
     errorImageResource: Int = R.drawable.broken_image,
-    placeholderImageResource: Int = R.drawable.broken_image
+    placeholderImageResource: Int = R.drawable.broken_image,
+    isClearable: Boolean = false,
+    onDeletionIconClicked: () -> Unit = {}
 ) {
     Box(
         modifier = modifier.size(size),
@@ -95,9 +122,21 @@ fun BasicImageBox(
             contentScale = ContentScale.Crop,
         )
 
-        val state = rememberAsyncImagePainter(model = imageResource).state
-        if (state is AsyncImagePainter.State.Loading) {
-            CircularProgressIndicator()
+        if (isClearable) {
+            IconButton(
+                onClick = onDeletionIconClicked,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "Clear",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }

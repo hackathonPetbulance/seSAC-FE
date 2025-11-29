@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.SharedFlow
 data class ReportArgument(
     val intent: (ReportIntent) -> Unit,
     val state: ReportState,
+    val screenState: ReportScreenState,
     val event: SharedFlow<ReportEvent>
 )
 
@@ -14,8 +15,14 @@ sealed class ReportState {
     data object OnProgress : ReportState()
 }
 
+sealed class ReportScreenState {
+    data object SummaryReport : ReportScreenState()
+    data object HospitalMatching : ReportScreenState()
+    data object FirstAidGuide : ReportScreenState()
+}
+
 sealed class ReportIntent {
-    data class SomeIntentWithParams(val param: String) : ReportIntent()
+    data class ScreenTransition(val tobe: ReportScreenState) : ReportIntent()
     data object SomeIntentWithoutParams : ReportIntent()
 }
 

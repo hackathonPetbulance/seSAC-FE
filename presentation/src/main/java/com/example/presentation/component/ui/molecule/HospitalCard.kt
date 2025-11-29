@@ -1,12 +1,9 @@
 package com.example.presentation.component.ui.molecule
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,6 +20,7 @@ import com.example.presentation.component.theme.PetbulanceTheme.colorScheme
 import com.example.presentation.component.theme.emp
 import com.example.presentation.component.ui.Dot
 import com.example.presentation.component.ui.atom.BasicButton
+import com.example.presentation.component.ui.atom.BasicCard
 import com.example.presentation.component.ui.atom.BasicChip
 import com.example.presentation.component.ui.atom.BasicImageBox
 import com.example.presentation.component.ui.atom.ButtonType
@@ -30,20 +28,14 @@ import com.example.presentation.component.ui.dropShadow
 
 @Composable
 fun HospitalCard(hospital: HospitalCard) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .dropShadow(
-                shape = RoundedCornerShape(16.dp),
-                color = Color.LightGray.copy(0.15f),
-                blur = 2.dp,
-                offsetY = 1.dp,
-                spread = 1.dp
-            )
-            .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp))
-            .background(colorScheme.bgFrameDefault, RoundedCornerShape(16.dp))
-            .padding(vertical = 20.dp, horizontal = 20.dp)
+    BasicCard(
+        modifier = Modifier.dropShadow(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.LightGray.copy(0.15f),
+            blur = 2.dp,
+            offsetY = 1.dp,
+            spread = 1.dp
+        )
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -107,7 +99,7 @@ private fun HospitalInfos(hospital: HospitalCard) {
                 style = MaterialTheme.typography.bodyMedium.emp(),
                 color = colorScheme.caption
             )
-            Dot(colorScheme.caption.copy(alpha= 0.8f))
+            Dot(colorScheme.caption.copy(alpha = 0.8f))
             Text(
                 text = "${hospital.todayCloseTime}에 영업 종료",
                 style = MaterialTheme.typography.bodyMedium.emp(),
@@ -119,7 +111,7 @@ private fun HospitalInfos(hospital: HospitalCard) {
             horizontalArrangement = Arrangement.spacedBy(commonRowSpacing)
         ) {
             hospital.treatableAnimals.forEach { elem ->
-                BasicChip(elem, Color(0XFFF6EF89))
+                BasicChip(elem, backgroundColor = Color(0XFFF6EF89))
             }
         }
     }
