@@ -8,12 +8,12 @@ import javax.inject.Inject
 class GetNearByHospitalUseCase @Inject constructor(
     private val repository: HospitalRepository
 ) {
-    suspend operator fun invoke(lat: Double, lng: Double): Result<List<MatchedHospital>> {
+    suspend operator fun invoke(lat: Double, lng: Double): List<MatchedHospital> {
         return repository.getMatchingHospitals(
             filter = HospitalFilterType.DISTANCE,
-            species = "",
+            species = null,
             lat = lat,
             lng = lng
-        )
+        ).getOrThrow()
     }
 }

@@ -28,8 +28,8 @@ fun BasicSelectableChip(
 
     Box(
         modifier = Modifier
-            .background(backgroundColor, RoundedCornerShape((20.dp)))
-            .border(1.dp, border, RoundedCornerShape(20.dp))
+            .background(backgroundColor, RoundedCornerShape((12.dp)))
+            .border(1.dp, border, RoundedCornerShape(12.dp))
             .padding(8.dp)
             .clickable { onClicked() }
     ) {

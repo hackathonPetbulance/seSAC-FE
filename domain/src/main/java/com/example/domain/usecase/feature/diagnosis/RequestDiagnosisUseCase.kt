@@ -12,12 +12,12 @@ class RequestDiagnosisUseCase @Inject constructor(
         animalType: String,
         symptom: String,
         onUpload: (bytesSent: Long, totalBytes: Long) -> Unit
-    ): Result<AiDiagnosis> {
+    ): AiDiagnosis {
         return repository.requestDiagnosis(
             images = images,
             animalType = animalType,
             symptom = symptom,
             onUpload = onUpload
-        )
+        ).getOrThrow()
     }
 }

@@ -8,7 +8,7 @@ sealed class ScreenDestinations(val route: String) {
 
     data object Report : ScreenDestinations("report")
 
-    data object Hospital : ScreenDestinations("Hospital")
-
-    data object Progress : ScreenDestinations("Progress")
+    data object Hospital : ScreenDestinations("hospital/{hospitalId}") {
+        fun createRoute(hospitalId: Long) = "hospital/$hospitalId"
+    }
 }

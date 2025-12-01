@@ -8,8 +8,8 @@ import com.example.presentation.component.ui.atom.BasicChip
 fun ChipWithHospitalInfo(info: String) {
 
     val chipBackgroundColor = when (info) {
-        "야간진료" -> colorScheme.warningText
-        "응급실" -> colorScheme.warningText
+        "야간진료" -> colorScheme.red
+        "응급실" -> colorScheme.red
         else -> colorScheme.surface
     }
     BasicChip(

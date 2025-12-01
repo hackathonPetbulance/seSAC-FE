@@ -1,6 +1,6 @@
 package com.example.data.repository.feature.diagnosis
 
-import com.example.data.remote.network.feature.diagnosis.model.DiagnosisResponse
+import com.example.data.remote.network.feature.diagnosis.model.DiagnosisData
 import com.example.data.remote.network.feature.diagnosis.model.FirstAidGuideContentResponse
 import com.example.data.remote.network.feature.hospital.model.HospitalDetailInfoResponse
 import com.example.domain.model.feature.diagnosis.AiDiagnosis
@@ -11,24 +11,23 @@ import com.example.domain.model.feature.hospitals.HospitalLocation
 import com.example.domain.model.feature.hospitals.OpenHours
 import com.example.domain.model.type.EmergencyLevel
 
-fun DiagnosisResponse.toDomain(): AiDiagnosis {
-    val data = this.data
+fun DiagnosisData.toDomain(): AiDiagnosis {
     return AiDiagnosis(
-        animalType = data.animalType,
-        emergencyLevel = when (data.emergencyLevel.uppercase()) {
+        animalType = this.animalType,
+        emergencyLevel = when (this.emergencyLevel.uppercase()) {
             "HIGH" -> EmergencyLevel.HIGH
             "MIDDLE" -> EmergencyLevel.MIDDLE
             "LOW" -> EmergencyLevel.LOW
             else -> EmergencyLevel.MIDDLE
         },
-        detectedSymptoms = data.detectedSymptoms,
-        suspectedDisease = data.suspectedDisease,
-        recommendedActions = data.recommendedActions,
+        detectedSymptoms = this.detectedSymptoms,
+        suspectedDisease = this.suspectedDisease,
+        recommendedActions = this.recommendedActions,
         firstAidGuide = FirstAidGuide(
-            totalSteps = data.totalSteps,
-            steps = data.steps.map { it.toDomain() }
+            totalSteps = this.totalSteps,
+            steps = this.steps.map { it.toDomain() }
         ),
-        confidence = data.confidence
+        confidence = this.confidence
     )
 }
 

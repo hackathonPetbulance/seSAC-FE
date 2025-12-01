@@ -2,9 +2,12 @@ package com.example.data.common.di
 
 import com.example.data.remote.local.preference.PreferenceRepositoryImpl
 import com.example.data.repository.ExampleRepositoryImpl
+import com.example.data.repository.feature.diagnosis.DiagnosisRepositoryImpl
 import com.example.data.repository.feature.diagnosis.MockDiagnosisRepository
+import com.example.data.repository.feature.hospital.HospitalRepositoryImpl
 import com.example.data.repository.feature.hospital.MockHospitalRepository
 import com.example.data.repository.feature.review.MockReviewRepository
+import com.example.data.repository.feature.review.ReviewRepositoryImpl
 import com.example.domain.repository.feature.ExampleRepository
 import com.example.domain.repository.feature.diagnosis.DiagnosisRepository
 import com.example.domain.repository.feature.hospital.HospitalRepository
@@ -34,19 +37,19 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindHospitalRepository(
-        mock: MockHospitalRepository
-//        impl: HospitalRepositoryImpl
+//        mock: MockHospitalRepository
+        impl: HospitalRepositoryImpl
     ): HospitalRepository
 
     @Binds
     abstract fun bindDiagnosisRepository(
-        mock: MockDiagnosisRepository
-//        impl: DiagnosisRepositoryImpl
+//        mock: MockDiagnosisRepository
+        impl: DiagnosisRepositoryImpl
     ): DiagnosisRepository
 
     @Binds
     abstract fun bindReviewRepository(
-        mock: MockReviewRepository
-//        impl: ReviewRepositoryImpl
+//        mock: MockReviewRepository
+        impl: ReviewRepositoryImpl
     ): ReviewRepository
 }

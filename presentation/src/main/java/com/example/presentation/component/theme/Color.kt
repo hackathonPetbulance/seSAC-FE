@@ -49,7 +49,10 @@ private val LightColorPalette = PetbulanceColorScheme(
     bgFrameDefault = Color(0xFFFFFFFF),
     defaultIcon = Color(0XFF424242),
 
-    warningText = Color(0xFFEF4343),
+    red = Color(0xFFEF4343),
+    yellow = Color(0xFFFFBB00),
+    blue= Color(0xFF067DFD),
+
     textSecondary = Color(0xFF212121),
 
     caption = Color(0xFF9E9E9E),
@@ -91,7 +94,10 @@ data class PetbulanceColorScheme(
 
     var defaultIcon: Color,
     var bgFrameDefault: Color,
-    var warningText: Color,
+
+    var red: Color,
+    var yellow: Color,
+    var blue: Color
 )
 
 val LocalPetbulanceColorScheme = staticCompositionLocalOf { LightColorPalette }

@@ -20,42 +20,48 @@ data class BaseResponse<T>(
     val message: String? = null
 )
 
+@Serializable
+data class ErrorResponse(
+    val timestamp: String,
+    val status: Int,
+    val error: String,
+    val path: String
+)
+
 suspend inline fun <reified T> safeApiCall(apiCall: suspend () -> HttpResponse): Result<T> {
-    return try {
+    try {
         val response = apiCall()
-        val responseBody = response.body<BaseResponse<T>>()
+        val responseString = response.body<String>()
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
 
         if (response.status.value in 200..299) {
-            responseBody.data?.let { Result.success(it) }
-                ?: Result.failure(Exception("Data is null"))
-        } else {
-            Result.failure(
-                mapToDomainException(
-                    response.status.value,
-                    responseBody.message ?: "No information from server"
+            val responseBody = json.decodeFromString<BaseResponse<T>>(responseString)
+            Log.d("siria22 - SafeApiCalls (Success)", responseString)
+
+            if (responseBody.success) {
+                responseBody.data?.let { return Result.success(it) }
+                    ?: return Result.failure(Exception("Data is null"))
+            } else {
+                return Result.failure(
+                    mapToDomainException(
+                        responseBody.status,
+                        responseBody.message ?: "No information from server"
+                    )
                 )
+            }
+        } else {
+            // 실패 시 ErrorResponse로 파싱
+            Log.e("siria22 - SafeApiCalls (Error)", responseString)
+            val errorBody = json.decodeFromString<ErrorResponse>(responseString)
+            return Result.failure(
+                mapToDomainException(errorBody.status, errorBody.error)
             )
         }
     } catch (e: Exception) {
-        val exception = when (e) {
-            is ClientRequestException -> parseErrorResponse(e.response)
-            is ServerResponseException -> parseErrorResponse(e.response)
-            else -> e
-        }
-        Result.failure(exception)
+        // 네트워크 오류 또는 예상치 못한 JSON 구조일 경우
+        Log.e("siria22_FatalError", "Exception in safeApiCall", e)
+        return Result.failure(e)
     }
-}
-
-suspend fun parseErrorResponse(response: HttpResponse): Exception {
-    val errorBody = try {
-        response.body<BaseResponse<String?>>()
-    } catch (e: Exception) {
-        null
-    }
-    val message = errorBody?.message ?: "An error occurred"
-    Log.e("siria22", "ApiErrorResponse: ${response.status.value} - $message")
-
-    return mapToDomainException(response.status.value, message)
 }
 
 fun mapToDomainException(code: Int, message: String): Exception {

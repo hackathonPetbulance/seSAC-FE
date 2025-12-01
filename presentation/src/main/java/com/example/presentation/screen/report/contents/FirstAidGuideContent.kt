@@ -91,11 +91,11 @@ fun FirstAidGuideContents(
                 onClicked = onHospitalMatchingResultClicked
             )
 
-            BasicButton(
-                text = "AI 챗봇에게 질문하기",
-                type = ButtonType.SECONDARY,
-                onClicked = {/* TODO : navigate to AI Chatbot */ }
-            )
+//            BasicButton(
+//                text = "AI 챗봇에게 질문하기",
+//                type = ButtonType.SECONDARY,
+//                onClicked = { }
+//            )
         }
     }
 
@@ -111,6 +111,11 @@ private fun SummaryCard(
     suspectedDisease: String,
 ) {
     BasicCard {
+        Text(
+            text = "병원으로 이동하는 동안 다음 안내에 따라 처치를 시행해 주세요",
+            style = MaterialTheme.typography.labelSmall.emp(),
+            color = colorScheme.textPrimary
+        )
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,

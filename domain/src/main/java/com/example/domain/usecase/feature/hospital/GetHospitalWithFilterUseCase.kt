@@ -8,12 +8,12 @@ import javax.inject.Inject
 class GetHospitalWithFilterUseCase @Inject constructor(
     private val repository: HospitalRepository
 ) {
-    suspend operator fun invoke(filter: HospitalFilterType, species: String, lat: Double, lng: Double): Result<List<MatchedHospital>> {
+    suspend operator fun invoke(filter: HospitalFilterType, species: String, lat: Double, lng: Double): List<MatchedHospital> {
         return repository.getMatchingHospitals(
             filter = filter,
             species = species,
             lat = lat,
             lng = lng
-        )
+        ).getOrThrow()
     }
 }

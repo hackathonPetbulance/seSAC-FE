@@ -11,11 +11,11 @@ class GetDetailHospitalInfoUseCase @Inject constructor(
         hospitalId: Long,
         userLat: Double,
         userLng: Double
-    ): Result<HospitalDetail> {
+    ): HospitalDetail {
         return repository.getHospitalDetailInfo(
             hospitalId = hospitalId,
             lat = userLat,
             lng = userLng
-        )
+        ).getOrThrow()
     }
 }

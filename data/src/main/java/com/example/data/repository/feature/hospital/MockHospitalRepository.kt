@@ -10,7 +10,7 @@ class MockHospitalRepository @Inject constructor() : HospitalRepository {
 
     override suspend fun getMatchingHospitals(
         filter: HospitalFilterType,
-        species: String,
+        species: String?,
         lat: Double,
         lng: Double
     ): Result<List<MatchedHospital>> {

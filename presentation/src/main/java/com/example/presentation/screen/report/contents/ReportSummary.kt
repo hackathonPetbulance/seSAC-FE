@@ -155,7 +155,7 @@ private fun EmergencyCard(emergencyLevel: EmergencyLevel) {
             )
             Text(
                 text = descriptionText,
-                style = MaterialTheme.typography.labelSmall.emp(),
+                style = MaterialTheme.typography.labelSmall,
                 color = colorScheme.textPrimary
             )
         }
@@ -245,7 +245,8 @@ private fun AiSummaryCard(
             }
             Text(
                 text,
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelSmall,
+                color = colorScheme.caption2
             )
         }
     }

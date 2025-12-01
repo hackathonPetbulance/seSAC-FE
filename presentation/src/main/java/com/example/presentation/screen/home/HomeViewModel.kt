@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import com.example.domain.model.feature.hospitals.MatchedHospital
-import com.example.domain.model.feature.review.HospitalReview
+import com.example.domain.model.feature.review.ReviewList
 import com.example.domain.usecase.feature.hospital.GetNearByHospitalUseCase
+import com.example.domain.usecase.feature.review.GetReviewsUseCase
+import com.example.domain.utils.zip
 import com.example.presentation.utils.BaseViewModel
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,11 +15,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getNearByHospitalUseCase: GetNearByHospitalUseCase,
+    private val getReviewsUseCase: GetReviewsUseCase,
     application: Application
 ) : BaseViewModel() {
 
@@ -28,61 +32,54 @@ class HomeViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<HomeEvent>()
     val eventFlow: SharedFlow<HomeEvent> = _eventFlow
-    private val _Matched_hospitalCards = MutableStateFlow(emptyList<MatchedHospital>())
-    val matchedHospitalCards: StateFlow<List<MatchedHospital>> = _Matched_hospitalCards
 
-    private val _hospitalReviews = MutableStateFlow(emptyList<HospitalReview>())
-    val hospitalReviews: StateFlow<List<HospitalReview>> = _hospitalReviews
+    private val _matchedHospitalCards = MutableStateFlow(emptyList<MatchedHospital>())
+    val matchedHospitalCards: StateFlow<List<MatchedHospital>> = _matchedHospitalCards
+
+    private val _hospitalReviews = MutableStateFlow(ReviewList.empty())
+    val hospitalReviews: StateFlow<ReviewList> = _hospitalReviews
 
 
     fun onIntent(intent: HomeIntent) {
         when (intent) {
             is HomeIntent.GetNearByHospital -> {
-                launch { getNearByHospital() }
+                launch {
+                    getNearByHospitalAndReviews()
+                }
             }
         }
     }
 
     @SuppressLint("MissingPermission")
-    private fun getNearByHospital() {
+    private suspend fun getNearByHospitalAndReviews() {
         _state.value = HomeState.OnProgress
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                launch {
-                    runCatching {
-                        getNearByHospitalUseCase(location.latitude, location.longitude)
-                    }.onSuccess { result ->
-                        Log.d(
-                            "siria22",
-                            "Request Success from : ${location.latitude},${location.longitude}"
-                        )
-                        _Matched_hospitalCards.value = result.getOrThrow()
-                    }.onFailure { ex ->
-                        _eventFlow.emit(
-                            HomeEvent.DataFetch.Error(
-                                userMessage = "근처 병원 조회에 실패했어요.",
-                                exceptionMessage = ex.message
-                            )
-                        )
-                    }
-                }
-            } else {
-                launch {
-                    _eventFlow.emit(
-                        HomeEvent.DataFetch.Error(
-                            userMessage = "위치 정보를 가져올 수 없습니다.",
-                            exceptionMessage = "Location is null"
-                        )
-                    )
-                }
-            }
-        }.addOnFailureListener { ex ->
-            launch {
+        val locationResult = runCatching {
+            fusedLocationClient.getCurrentLocation(
+                com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY,
+                null
+            ).await()
+        }
+
+        Log.d("siria22", "Fused location client settled")
+        locationResult.onSuccess { location ->
+            runCatching {
+                zip(
+                    { getNearByHospitalUseCase(location.latitude, location.longitude) },
+                    { getReviewsUseCase(null, null, null, null, null) }
+                )
+            }.onSuccess { (hospitalList, reviewList) ->
+                Log.d("siria22", "getNearByHospitalAndReviews success: \n" +
+                        "hospitalList : ${hospitalList.size} items,\n" +
+                        "reviewList : ${reviewList.list.size} items")
+                _matchedHospitalCards.value = hospitalList
+                _hospitalReviews.value = reviewList
+            }.onFailure { exception ->
+                Log.e("siria22", "getNearByHospitalAndReviews failed", exception)
                 _eventFlow.emit(
                     HomeEvent.DataFetch.Error(
-                        userMessage = "위치 정보 조회에 실패했습니다.",
-                        exceptionMessage = ex.message
+                        userMessage = "병원 정보를 가져오는 데 실패했습니다.",
+                        exceptionMessage = exception.message
                     )
                 )
             }

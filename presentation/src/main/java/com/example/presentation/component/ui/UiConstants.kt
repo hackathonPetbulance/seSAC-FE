@@ -29,6 +29,27 @@ val SmallRoundedCorner = RoundedCornerShape(4.dp)
 val DefaultRoundedCorner = RoundedCornerShape(8.dp)
 val LargeRoundedCorner = RoundedCornerShape(16.dp)
 
+val RoundedCorner = RoundedCornerShape(1000.dp)
+
+
+val spacingXXXS = 2.dp
+val spacingXXS = 4.dp
+val spacingXS = 8.dp
+val spacingSmall = 12.dp
+val spacingMedium = 16.dp
+val spacingLarge = 20.dp
+val spacingXL = 24.dp
+val spacingXXL = 32.dp
+
+// ui size
+
+val iconSizeXS = 12.dp
+val iconSizeSmall = 16.dp
+val iconSizeMs = 20.dp
+val iconSizeMedium = 24.dp
+
+
+
 
 // Content Padding
 val CommonPadding = 20.dp

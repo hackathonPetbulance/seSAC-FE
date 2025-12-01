@@ -59,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.domain.model.type.HospitalFilterType
 import com.example.presentation.component.theme.PetbulanceTheme
 import com.example.presentation.component.theme.PetbulanceTheme.colorScheme
 import com.example.presentation.component.theme.emp
@@ -74,6 +75,8 @@ import com.example.presentation.component.ui.atom.ButtonType
 import com.example.presentation.component.ui.atom.CustomGreenLoader
 import com.example.presentation.component.ui.atom.IconResource
 import com.example.presentation.component.ui.organism.AppTopBar
+import com.example.presentation.component.ui.organism.BottomNavigationBar
+import com.example.presentation.component.ui.organism.CurrentBottomNav
 import com.example.presentation.component.ui.organism.TopBarAlignment
 import com.example.presentation.component.ui.organism.TopBarInfo
 import com.example.presentation.utils.PermissionHandler
@@ -142,6 +145,8 @@ fun DiagnosisScreen(
 
                 is DiagnosisEvent.Request.Success -> {
                     isReportReady = true
+                    Log.d("siria22", "Match Hospital by filter intent")
+                    argument.intent(DiagnosisIntent.MatchHospitalByFilter(HospitalFilterType.DISTANCE))
                 }
 
                 is DiagnosisEvent.Request.Error -> {
@@ -184,6 +189,12 @@ fun DiagnosisScreen(
                     ),
                 )
             }
+        },
+        bottomBar = {
+            BottomNavigationBar(
+                selectedItem = CurrentBottomNav.AI,
+                navController = navController
+            )
         },
         containerColor = colorScheme.bgFrameDefault
     ) { innerPadding ->
@@ -593,12 +604,13 @@ private fun UploadCard(
                 BasicIcon(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(48.dp)
                         .clickable {
                             onAddImageIconClicked()
                         },
                     iconResource = IconResource.Vector(Icons.Default.Add),
                     contentDescription = "Add image",
-                    size = 12.dp,
+                    size = 1.dp,
                     tint = Color(0xFF9E9E9E)
                 )
             } else {
@@ -616,12 +628,12 @@ private fun UploadCard(
             Text(
                 text = recommendationText,
                 color = recommendationTextColor,
-                style = typography.labelMedium.emp()
+                style = typography.bodyMedium.emp()
             )
             Text(
                 text = recommendationDescriptionText,
                 color = colorScheme.caption,
-                style = typography.labelMedium.emp()
+                style = typography.bodyMedium
             )
         }
     }
@@ -642,7 +654,7 @@ private fun UserInputSection(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = "직접 입력하기",
+            text = "텍스트로 직접 설명하기",
             color = colorScheme.textPrimary,
             style = typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
         )
@@ -657,7 +669,7 @@ private fun UserInputSection(
                     Text(
                         text = animalSpecies.ifBlank { "동물종" },
                         color = colorScheme.textPrimary,
-                        style = typography.bodyLarge,
+                        style = typography.bodyLarge.emp(),
                     )
                     BasicIcon(
                         iconResource = IconResource.Vector(Icons.Default.KeyboardArrowDown),
@@ -670,7 +682,7 @@ private fun UserInputSection(
                 Text(
                     text = "주요 증상",
                     color = colorScheme.textPrimary,
-                    style = typography.bodyLarge,
+                    style = typography.bodyLarge.emp(),
                 )
 
                 BasicInputTextField(
@@ -756,7 +768,7 @@ private fun DiagnosisScreenPreview() {
             argument = DiagnosisArgument(
                 intent = { },
                 state = DiagnosisState.Init,
-                screenState = DiagnosisScreenState.OnProgress,
+                screenState = DiagnosisScreenState.Upload,
                 event = MutableSharedFlow()
             ),
             data = DiagnosisData.empty()

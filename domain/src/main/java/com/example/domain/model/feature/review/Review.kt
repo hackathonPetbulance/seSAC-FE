@@ -50,4 +50,21 @@ data class Review(
     val author: String,
     val likeCount: Int,
     val createdAt: LocalDateTime
-)
+) {
+    companion object {
+        fun stub() = Review(
+            receiptCheck = true,
+            id = 1,
+            hospitalImage = "https://example.com/hospital.jpg",
+            hospitalId = 1,
+            hospitalName = "Example Hospital",
+            treatmentService = "Treatment Service",
+            detailAnimalType = "Detail Animal Type",
+            reviewContent = "Review Content",
+            totalRating = 4.5,
+            author = "Author",
+            likeCount = 24,
+            createdAt = LocalDateTime.now()
+        )
+    }
+}

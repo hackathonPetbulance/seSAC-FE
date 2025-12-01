@@ -83,6 +83,8 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location) // Location
 
+    implementation(libs.jetbrains.kotlinx.coroutines.play.services)
+
     // Firebase & Auth
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)

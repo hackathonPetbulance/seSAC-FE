@@ -33,8 +33,6 @@ fun NavGraphBuilder.homeDestination(navController: NavController) {
                 matchedHospitals = hospitalCards,
                 hospitalReviews = hospitalReviews
             )
-
-            HomeData.stub()
         }
 
         HomeScreen(

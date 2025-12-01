@@ -23,7 +23,8 @@ import com.example.presentation.R
 import com.example.presentation.component.theme.PetbulanceTheme
 import com.example.presentation.component.ui.atom.BasicIcon
 import com.example.presentation.component.ui.atom.IconResource
-import com.example.presentation.utils.nav.safePopBackStack
+import com.example.presentation.utils.nav.ScreenDestinations
+import com.example.presentation.utils.nav.safeNavigate
 
 /**
  * Bottom Navigation Bar
@@ -40,28 +41,27 @@ fun BottomNavigationBar(
 ) {
     val navItemList = listOf(
         BottomNavInfo(
-            label = "기록",
-            iconResourceId = R.drawable.history,
-            bottomNavType = CurrentBottomNav.HISTORY,
-            onClicked = {
-                // TODO : [Bottom Nav] Navigate to History Screen
-                // navController.safeNavigate(ScreenDestinations.History.route)
-            }
-        ),
-        BottomNavInfo(
             label = "홈",
-            iconResourceId = R.drawable.home,
+            iconResourceId = IconResource.Drawable(R.drawable.icon_home),
             bottomNavType = CurrentBottomNav.HOME,
             onClicked = {
-                navController.safePopBackStack()
+                navController.safeNavigate(ScreenDestinations.Home.route)
             }
         ),
         BottomNavInfo(
-            label = "프로필",
-            iconResourceId = R.drawable.account_circle,
-            bottomNavType = CurrentBottomNav.PROFILE,
+            label = "펫뷸런스 AI",
+            iconResourceId = IconResource.Drawable(R.drawable.icon_ai),
+            bottomNavType = CurrentBottomNav.AI,
             onClicked = {
-                // TODO : [Bottom Nav] Navigate to Profile Screen
+                navController.safeNavigate(ScreenDestinations.Diagnosis.route)
+            }
+        ),
+        BottomNavInfo(
+            label = "병원검색",
+            iconResourceId = IconResource.Drawable(R.drawable.icon_search),
+            bottomNavType = CurrentBottomNav.SEARCH,
+            onClicked = {
+                // TODO : [Bottom Nav] Navigate to Map Screen
                 // navController.safeNavigate(ScreenDestinations.Profile.route)
             }
         )
@@ -76,7 +76,7 @@ fun BottomNavigationBar(
     ) {
         navItemList.forEachIndexed { _, item ->
             BottomNavItem(
-                iconRes = IconResource.Drawable(item.iconResourceId),
+                iconRes = item.iconResourceId,
                 itemLabel = item.label,
                 isSelected = (selectedItem == item.bottomNavType),
                 modifier = Modifier
@@ -98,7 +98,7 @@ private fun BottomNavItem(
     modifier: Modifier,
     onClicked: () -> Unit
 ) {
-    val selectedColor = PetbulanceTheme.colorScheme.iconTint
+    val selectedColor = PetbulanceTheme.colorScheme.primary
     val unselectedColor = PetbulanceTheme.colorScheme.inactivatedIconColor
 
     val iconColor = if (isSelected) selectedColor else unselectedColor
@@ -133,13 +133,13 @@ private fun BottomNavItem(
 
 data class BottomNavInfo(
     val label: String,
-    val iconResourceId: Int,
+    val iconResourceId: IconResource,
     val bottomNavType: CurrentBottomNav,
     val onClicked: () -> Unit
 )
 
 enum class CurrentBottomNav {
-    HISTORY, HOME, PROFILE
+    HOME, AI, SEARCH
 }
 
 @Preview

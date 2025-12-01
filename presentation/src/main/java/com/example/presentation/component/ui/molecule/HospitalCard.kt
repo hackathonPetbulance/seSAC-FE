@@ -1,9 +1,12 @@
 package com.example.presentation.component.ui.molecule
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,7 +30,8 @@ import com.example.presentation.component.ui.atom.ButtonType
 import com.example.presentation.component.ui.dropShadow
 
 @Composable
-fun HospitalCard(hospital: MatchedHospital) {
+fun HospitalCard(hospital: MatchedHospital,
+                 onClicked: () -> Unit) {
     BasicCard(
         modifier = Modifier.dropShadow(
             shape = RoundedCornerShape(16.dp),
@@ -35,7 +39,9 @@ fun HospitalCard(hospital: MatchedHospital) {
             blur = 2.dp,
             offsetY = 1.dp,
             spread = 1.dp
-        )
+        ).clickable {
+            onClicked()
+        }
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -82,6 +88,11 @@ private fun HospitalInfos(hospital: MatchedHospital) {
                 color = colorScheme.textPrimary,
                 style = MaterialTheme.typography.titleSmall.emp()
             )
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(commonRowSpacing),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             if (hospital.isOpenNow) {
                 Text(
                     text = "진료 중",
@@ -89,25 +100,22 @@ private fun HospitalInfos(hospital: MatchedHospital) {
                     color = Color(0XFF067DFD)
                 )
             }
-        }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(commonRowSpacing),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
             Text(
-                text = "${hospital.distanceKm}km",
+                text = "%.2f".format(hospital.distanceKm)+ " km",
                 style = MaterialTheme.typography.bodyMedium.emp(),
                 color = colorScheme.caption
             )
             Dot(colorScheme.caption.copy(alpha = 0.8f))
             Text(
-                text = "${hospital.todayCloseTime}에 영업 종료",
+                text = "${hospital.todayCloseTime.take(5)}까지", /// TODO: Report - 에 영업종료 = 칸 짤림
                 style = MaterialTheme.typography.bodyMedium.emp(),
                 color = colorScheme.textTertiary
             )
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(commonRowSpacing)
         ) {
             hospital.treatableAnimals.forEach { elem ->
@@ -121,6 +129,6 @@ private fun HospitalInfos(hospital: MatchedHospital) {
 @Composable
 private fun HospitalCardPreview() {
     PetbulanceTheme {
-        HospitalCard(MatchedHospital.stub())
+        HospitalCard(MatchedHospital.stub(), {})
     }
 }

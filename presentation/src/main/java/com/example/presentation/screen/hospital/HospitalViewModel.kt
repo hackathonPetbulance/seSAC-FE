@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.SavedStateHandle
 import com.example.domain.model.feature.hospitals.HospitalDetail
@@ -54,17 +55,7 @@ class HospitalViewModel @Inject constructor(
     val reviews: StateFlow<ReviewList?> = _reviews
 
 
-    fun onIntent(intent: HospitalIntent) {
-        when (intent) {
-            is HospitalIntent.SomeIntentWithoutParams -> {
-                //do sth
-            }
-
-            is HospitalIntent.SomeIntentWithParams -> {
-                //do sth(intent.params)
-            }
-        }
-    }
+    fun onIntent(intent: HospitalIntent) {}
 
     init {
         launch {
@@ -73,7 +64,6 @@ class HospitalViewModel @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-
     private fun checkAndFetchLocation(context: Context) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -83,6 +73,7 @@ class HospitalViewModel @Inject constructor(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
+            Log.d("siria22", "Hospital VM - Has location permission")
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 launch {
                     val currentLocation = location ?: defaultLocation
@@ -120,7 +111,10 @@ class HospitalViewModel @Inject constructor(
                 userLng = userLng
             )
         }.onSuccess { result ->
-            _hospital.value = result.getOrThrow()
+            Log.d("siria22", "getDetailHospitalInfo($userLat, $userLng) success:\n" +
+                    "result : $result")
+            _hospital.value = result
+            getReviews()
         }.onFailure { exception ->
             _eventFlow.emit(
                 HospitalEvent.DataFetch.Error(
@@ -135,13 +129,14 @@ class HospitalViewModel @Inject constructor(
     private suspend fun getReviews() {
         _state.value = HospitalState.OnProgress
         runCatching {
-            getReviewsUseCase(region = _hospital.value?.name ?: "")
+            getReviewsUseCase(_hospital.value?.name, null, null, null, null)
         }.onSuccess { result ->
-            _reviews.value = result.getOrThrow()
+            Log.d("siria22", "getReviews success:\nresult : $result")
+            _reviews.value = result
         }.onFailure { ex ->
             _eventFlow.emit(
                 HospitalEvent.DataFetch.Error(
-                    userMessage = "error messages",
+                    userMessage = "리뷰 정보를 불러오는데 실패했습니다.",
                     exceptionMessage = ex.message
                 )
             )

@@ -28,14 +28,14 @@ class DiagnosisApi @Inject constructor(
         symptom: String,
         onUpload: (bytesSent: Long, totalBytes: Long) -> Unit
     ): HttpResponse {
-        return client.post(baseUrl) {
+        return client.post("$baseUrl/diagnosis") {
             setBody(
                 MultiPartFormDataContent(
                     formData {
                         append("animalType", animalType)
                         append("symptom", symptom)
 
-                        images.forEachIndexed { index, uri ->
+                        images.filterNotNull().forEachIndexed { index, uri ->
                             val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
                             val ext = if (mimeType.contains("png")) "png" else "jpg"
                             val fileName = "image_$index.$ext"

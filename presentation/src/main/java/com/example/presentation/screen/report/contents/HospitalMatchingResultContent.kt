@@ -56,7 +56,8 @@ fun HospitalMatchingResult(
     emergencyLevel: EmergencyLevel,
     animalType: String,
     onFirstAidGuideClicked: () -> Unit,
-    onHospitalMatchRequest: (HospitalFilterType) -> Unit
+    onHospitalMatchRequest: (HospitalFilterType) -> Unit,
+    onHospitalCardClicked: (Long) -> Unit
 ) {
     var currentFilter by remember { mutableStateOf(HospitalFilterType.DISTANCE) }
 
@@ -90,7 +91,7 @@ fun HospitalMatchingResult(
             ) {
                 if(hospitals.isNotEmpty()) {
                     hospitals.forEach { hospital ->
-                        HospitalCard(hospital)
+                        HospitalCard(hospital, { onHospitalCardClicked(hospital.hospitalId) })
                     }
 
                     CheckedByTeam(modifier = Modifier.fillMaxWidth())
@@ -213,7 +214,8 @@ private fun HospitalMatchingResultPreview() {
             emergencyLevel = EmergencyLevel.MIDDLE,
             animalType = "앵무새",
             onFirstAidGuideClicked = {},
-            onHospitalMatchRequest = {}
+            onHospitalMatchRequest = {},
+            {}
         )
     }
 }

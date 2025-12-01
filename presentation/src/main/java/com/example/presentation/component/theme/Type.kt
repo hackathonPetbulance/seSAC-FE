@@ -12,7 +12,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion.W400
+import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,42 +28,42 @@ val PretendardVariable = FontFamily(
 val PretendardTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = PretendardVariable,
-        fontWeight = W400,
+        fontWeight = W500,
         fontSize = 57.sp,
         lineHeight = 64.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
         fontFamily = PretendardVariable,
-        fontWeight = W400,
+        fontWeight = W500,
         fontSize = 45.sp,
         lineHeight = 52.sp,
         letterSpacing = 0.sp
     ),
     displaySmall = TextStyle(
         fontFamily = PretendardVariable,
-        fontWeight = W400,
+        fontWeight = W500,
         fontSize = 36.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.sp
     ),
     headlineLarge = TextStyle(
         fontFamily = PretendardVariable,
-        fontWeight = W400,
+        fontWeight = W500,
         fontSize = 32.sp,
         lineHeight = 40.sp,
         letterSpacing = 0.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = PretendardVariable,
-        fontWeight = W400,
+        fontWeight = W500,
         fontSize = 28.sp,
         lineHeight = 36.sp,
         letterSpacing = 0.sp
     ),
     headlineSmall = TextStyle(
         fontFamily = PretendardVariable,
-        fontWeight = W400,
+        fontWeight = W500,
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.sp

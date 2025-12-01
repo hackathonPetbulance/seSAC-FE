@@ -160,7 +160,7 @@ private fun AppTopBarPreview() {
                 AppTopBar(
                     topBarInfo = TopBarInfo(
                         text = text,
-                        textAlignment = TopBarAlignment.CENTER,
+                        textAlignment = TopBarAlignment.START,
                         isLeadingIconAvailable = false,
                         onLeadingIconClicked = { },
                         trailingIcons = emptyList()

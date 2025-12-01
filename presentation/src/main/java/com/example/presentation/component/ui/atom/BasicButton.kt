@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.presentation.component.theme.PetbulanceTheme
+import com.example.presentation.component.theme.emp
 
 @Composable
 fun BasicButton(
@@ -34,7 +35,7 @@ fun BasicButton(
         ButtonType.PRIMARY -> PetbulanceTheme.colorScheme.primaryButtonColor
         ButtonType.SECONDARY -> PetbulanceTheme.colorScheme.secondaryButtonColor
         ButtonType.DEFAULT -> PetbulanceTheme.colorScheme.surface
-        ButtonType.EMERGENCY -> PetbulanceTheme.colorScheme.warningText
+        ButtonType.EMERGENCY -> PetbulanceTheme.colorScheme.red
     }
 
     val textColor = when (type) {
@@ -61,7 +62,7 @@ fun BasicButton(
         Text(
             text = text,
             color = textColor,
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.titleSmall.emp(),
             modifier = Modifier.padding(vertical = 12.dp)
         )
     }
@@ -79,7 +80,7 @@ fun BasicButtonWithIcon(
         ButtonType.PRIMARY -> PetbulanceTheme.colorScheme.primaryButtonColor
         ButtonType.SECONDARY -> PetbulanceTheme.colorScheme.secondaryButtonColor
         ButtonType.DEFAULT -> PetbulanceTheme.colorScheme.surface
-        ButtonType.EMERGENCY -> PetbulanceTheme.colorScheme.warningText
+        ButtonType.EMERGENCY -> PetbulanceTheme.colorScheme.red
     }
 
     val textColor = when (type) {

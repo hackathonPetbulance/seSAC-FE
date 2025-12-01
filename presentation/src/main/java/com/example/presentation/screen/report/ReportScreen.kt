@@ -77,7 +77,7 @@ fun ReportScreen(
         },
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = CurrentBottomNav.HOME,
+                selectedItem = CurrentBottomNav.AI,
                 navController = navController
             )
         },
@@ -98,6 +98,9 @@ fun ReportScreen(
                 },
                 onHospitalMatchRequest = { filter ->
                     argument.diagnosisIntent(DiagnosisIntent.MatchHospitalByFilter(filter))
+                },
+                onHospitalCardClicked = { id ->
+                    navController.safeNavigate(ScreenDestinations.Hospital.createRoute(id))
                 }
             )
         }
@@ -125,7 +128,8 @@ private fun ReportScreenContents(
     matchedHospitals: List<MatchedHospital>,
     onHospitalMatchingResultClicked: () -> Unit,
     onFirstAidGuideClicked: () -> Unit,
-    onHospitalMatchRequest: (HospitalFilterType) -> Unit
+    onHospitalMatchRequest: (HospitalFilterType) -> Unit,
+    onHospitalCardClicked: (Long)-> Unit
 ) {
     when (screenState) {
         ReportScreenState.SummaryReport -> ReportSummary(
@@ -145,7 +149,8 @@ private fun ReportScreenContents(
             emergencyLevel = aiDiagnosis.emergencyLevel,
             animalType = aiDiagnosis.animalType,
             onFirstAidGuideClicked = onFirstAidGuideClicked,
-            onHospitalMatchRequest = onHospitalMatchRequest
+            onHospitalMatchRequest = onHospitalMatchRequest,
+            onHospitalCardClicked = onHospitalCardClicked
         )
 
         ReportScreenState.FirstAidGuide -> FirstAidGuideContents(

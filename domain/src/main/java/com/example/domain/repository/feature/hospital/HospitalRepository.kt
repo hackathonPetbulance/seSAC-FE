@@ -7,7 +7,7 @@ import com.example.domain.model.type.HospitalFilterType
 interface HospitalRepository {
     suspend fun getMatchingHospitals(
         filter: HospitalFilterType,
-        species: String,
+        species: String?,
         lat: Double,
         lng: Double
     ): Result<List<MatchedHospital>>

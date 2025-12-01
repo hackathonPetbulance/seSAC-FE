@@ -117,23 +117,21 @@ class DiagnosisViewModel @Inject constructor(
         runCatching {
             _screenState.value = DiagnosisScreenState.OnProgress
             _eventFlow.emit(DiagnosisEvent.Request.OnProgress)
+
             requestDiagnosisUseCase(
-                images = _imageUris.value.take(3).map { it.toString() },
+                images = _imageUris.value.filterNotNull().take(3).map { it.toString() },
                 animalType = _animalSpecies.value,
                 symptom = _description.value,
                 onUpload = onUpload
             )
         }.onSuccess { result ->
             Log.d(
-                "siria22", "Request Sent\n" +
-                        "${_imageUris.value.map { it.toString() }}, \n" +
+                "siria22", "requestDiagnosis success\n" +
+                        "param : ${_imageUris.value.map { it.toString() }}, \n" +
                         "${_animalSpecies.value}, \n" +
                         _description.value
             )
-            result.getOrNull()?.let {
-                _aiDiagnosis.value = it
-                _eventFlow.emit(DiagnosisEvent.Request.Success)
-            }
+            _aiDiagnosis.value = result
             _eventFlow.emit(DiagnosisEvent.Request.Success)
         }.onFailure { exception ->
             _eventFlow.emit(
@@ -166,7 +164,7 @@ class DiagnosisViewModel @Inject constructor(
                             "siria22",
                             "Request Success from : ${location.latitude},${location.longitude}"
                         )
-                        _matchedHospitals.value = result.getOrThrow()
+                        _matchedHospitals.value = result
                     }.onFailure { ex ->
                         _eventFlow.emit(
                             DiagnosisEvent.DataFetch.Error(

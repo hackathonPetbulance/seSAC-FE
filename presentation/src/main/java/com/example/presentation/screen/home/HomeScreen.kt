@@ -42,13 +42,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.domain.model.feature.hospitals.MatchedHospital
-import com.example.domain.model.feature.review.HospitalReview
+import com.example.domain.model.feature.review.Review
+import com.example.domain.model.feature.review.ReviewList
 import com.example.domain.model.type.AnimalCategory
 import com.example.domain.model.type.toKorean
 import com.example.presentation.component.theme.PetbulanceTheme
@@ -65,6 +67,8 @@ import com.example.presentation.component.ui.atom.IconResource
 import com.example.presentation.component.ui.molecule.HospitalCard
 import com.example.presentation.component.ui.molecule.PermissionRequiredCard
 import com.example.presentation.component.ui.organism.AppTopBar
+import com.example.presentation.component.ui.organism.BottomNavigationBar
+import com.example.presentation.component.ui.organism.CurrentBottomNav
 import com.example.presentation.component.ui.organism.TopBarAlignment
 import com.example.presentation.component.ui.organism.TopBarInfo
 import com.example.presentation.utils.PermissionHandler
@@ -83,7 +87,7 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     var errorDialogState by remember { mutableStateOf(ErrorDialogState.idle()) }
-    var hasLocationPermission by remember { mutableStateOf(true) }
+    var hasLocationPermission by remember { mutableStateOf(true) } /* todo : false */
 
     var currentSelectedAnimalCategory by remember { mutableStateOf(AnimalCategory.SMALL_MAMMAL) }
     val onReviewCategoryChipClicked = { animalCategory: AnimalCategory ->
@@ -130,6 +134,12 @@ fun HomeScreen(
                 ),
             )
         },
+        bottomBar = {
+            BottomNavigationBar(
+                selectedItem = CurrentBottomNav.HOME,
+                navController = navController
+            )
+        },
         containerColor = colorScheme.bgFrameDefault
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
@@ -142,6 +152,9 @@ fun HomeScreen(
                 onNavigateToDiagnosisScreen = {
                     navController.safeNavigate(ScreenDestinations.Diagnosis.route)
                 },
+                onHospitalCardClicked = { id ->
+                    navController.safeNavigate(ScreenDestinations.Hospital.createRoute(id))
+                }
             )
         }
     }
@@ -163,10 +176,11 @@ fun HomeScreen(
 private fun HomeScreenContents(
     hasLocationPermission: Boolean,
     matchedHospitals: List<MatchedHospital>,
-    hospitalReviews: List<HospitalReview>,
+    hospitalReviews: ReviewList,
     currentSelectedAnimalCategory: AnimalCategory,
     onNavigateToDiagnosisScreen: () -> Unit,
-    onReviewCategoryChipClicked: (AnimalCategory) -> Unit
+    onReviewCategoryChipClicked: (AnimalCategory) -> Unit,
+    onHospitalCardClicked: (Long) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -177,7 +191,7 @@ private fun HomeScreenContents(
     ) {
         StartAiReportCard(onNavigateToDiagnosisScreen)
 
-        NearByHospitalCards(hasLocationPermission, matchedHospitals)
+        NearByHospitalCards(hasLocationPermission, matchedHospitals, onHospitalCardClicked)
 
         HospitalReviews(
             hospitalReviews = hospitalReviews,
@@ -235,7 +249,7 @@ private fun StartAiReportCard(
                     }
                     withStyle(
                         style = SpanStyle(
-                            color = colorScheme.warningText,
+                            color = colorScheme.red,
                             fontWeight = FontWeight.W600
                         )
                     ) {
@@ -273,7 +287,8 @@ private fun StartAiReportCard(
 @Composable
 private fun NearByHospitalCards(
     hasLocationPermission: Boolean,
-    matchedHospitals: List<MatchedHospital>
+    matchedHospitals: List<MatchedHospital>,
+    onHospitalCardClicked: (Long) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -287,7 +302,7 @@ private fun NearByHospitalCards(
         )
         if (hasLocationPermission) {
             matchedHospitals.forEach { hospital ->
-                HospitalCard(hospital)
+                HospitalCard(hospital, { onHospitalCardClicked(hospital.hospitalId) })
             }
         } else {
             PermissionRequiredCard("위치 정보 수집 권한")
@@ -298,7 +313,7 @@ private fun NearByHospitalCards(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HospitalReviews(
-    hospitalReviews: List<HospitalReview>,
+    hospitalReviews: ReviewList,
     currentSelectedAnimalCategory: AnimalCategory,
     onReviewCategoryChipClicked: (AnimalCategory) -> Unit
 ) {
@@ -337,7 +352,7 @@ private fun HospitalReviews(
             flingBehavior = snapBehavior,
             contentPadding = PaddingValues(horizontal = 0.dp),
         ) {
-            items(hospitalReviews) { elem ->
+            items(hospitalReviews.list) { elem ->
                 HospitalReviewCarouselCard(
                     modifier = Modifier.fillParentMaxWidth(),
                     review = elem
@@ -346,12 +361,11 @@ private fun HospitalReviews(
         }
     }
 }
-// 병원 후기에서는 페이징 없음 -> 필터링 된 결과 그냥 그대로 던져줌
 
 @Composable
 private fun HospitalReviewCarouselCard(
     modifier: Modifier = Modifier,
-    review: HospitalReview
+    review: Review
 ) {
     BasicCard(modifier = modifier) {
         Row(
@@ -360,7 +374,7 @@ private fun HospitalReviewCarouselCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = review.title,
+                text = review.hospitalName,
                 style = typography.run { titleSmall.emp() },
                 color = colorScheme.reviewTextColor
             )
@@ -393,17 +407,18 @@ private fun HospitalReviewCarouselCard(
             )
             Dot(colorScheme.caption2, 1.dp)
             Text(
-                text = review.animalCategory.toKorean(),
+                text = review.treatmentService,
                 style = typography.bodySmall.emp(),
                 color = colorScheme.caption2
             )
         }
 
         Text(
-            text = review.content.take(150),
+            text = review.reviewContent.take(150),
             style = typography.bodySmall.emp(),
             color = colorScheme.reviewTextColor,
             softWrap = true,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.fillMaxWidth()
         )
     }

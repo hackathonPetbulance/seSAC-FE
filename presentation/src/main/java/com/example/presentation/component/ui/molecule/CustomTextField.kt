@@ -84,14 +84,14 @@ fun TextFieldWithHelperAndLengthConstraints(
                 text = description.ifEmpty { "적절한 내용을 입력해주세요" },
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (value.length <= maxLength) PetbulanceTheme.colorScheme.commonText
-                else PetbulanceTheme.colorScheme.warningText,
+                else PetbulanceTheme.colorScheme.red,
                 textAlign = TextAlign.Center
             )
             Text(
                 text = "(${value.length} / ${maxLength})",
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (value.length <= maxLength) PetbulanceTheme.colorScheme.commonText
-                else PetbulanceTheme.colorScheme.warningText,
+                else PetbulanceTheme.colorScheme.red,
                 textAlign = TextAlign.Center
             )
         }

@@ -20,7 +20,7 @@ import com.example.presentation.component.ui.atom.IconResource
 @Composable
 fun ChipWithIcon(
     modifier : Modifier = Modifier,
-    info: String,
+    text: String,
     iconResource: IconResource,
     backgroundColor: Color,
     contentColor: Color,
@@ -37,12 +37,12 @@ fun ChipWithIcon(
     ) {
         BasicIcon(
             iconResource = iconResource,
-            contentDescription = "$info Icon",
+            contentDescription = "$text Icon",
             size = 20.dp,
             tint = contentColor
         )
         Text(
-            text = info,
+            text = text,
             style = MaterialTheme.typography.labelMedium.emp(),
             color = contentColor
         )

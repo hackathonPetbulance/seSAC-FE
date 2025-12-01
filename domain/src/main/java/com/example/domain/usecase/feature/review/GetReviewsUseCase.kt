@@ -13,7 +13,7 @@ class GetReviewsUseCase @Inject constructor(
         receipt: Boolean? = null,
         size: Int? = 10,
         cursorId: Long? = null
-    ): Result<ReviewList> {
-        return repository.getReviews(region, animalType, receipt, size, cursorId)
+    ): ReviewList {
+        return repository.getReviews(region, animalType, receipt, size, cursorId).getOrThrow()
     }
 }

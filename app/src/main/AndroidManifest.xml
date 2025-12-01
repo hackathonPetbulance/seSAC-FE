@@ -32,7 +32,9 @@
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/provider_paths" />
         </provider>
-
+        <meta-data
+                android:name="com.naver.maps.map.NCP_KEY_ID"
+                android:value="jmae3htv3h" />
         <activity
                 android:name=".MainActivity"
                 android:exported="true"

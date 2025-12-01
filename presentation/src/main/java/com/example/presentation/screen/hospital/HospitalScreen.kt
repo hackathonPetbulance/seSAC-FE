@@ -72,6 +72,8 @@ import com.example.presentation.component.ui.atom.IconResource
 import com.example.presentation.component.ui.molecule.ChipWithIcon
 import com.example.presentation.component.ui.molecule.HospitalInfoCard
 import com.example.presentation.component.ui.organism.AppTopBar
+import com.example.presentation.component.ui.organism.BottomNavigationBar
+import com.example.presentation.component.ui.organism.CurrentBottomNav
 import com.example.presentation.component.ui.organism.TopBarAlignment
 import com.example.presentation.component.ui.organism.TopBarInfo
 import com.example.presentation.utils.NaverMapView
@@ -118,6 +120,12 @@ fun HospitalScreen(
                         )
                     )
                 ),
+            )
+        },
+        bottomBar = {
+            BottomNavigationBar(
+                selectedItem = CurrentBottomNav.AI,
+                navController = navController
             )
         },
         containerColor = colorScheme.bgFrameDefault,
@@ -271,7 +279,7 @@ private fun DetailTab(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 160.dp)
+                .heightIn(min = 240.dp)
         ) {
             NaverMapView(
                 currentLocation = currentLocation,
@@ -461,7 +469,7 @@ private fun ReviewTab(reviews: ReviewList) {
                     modifier = Modifier.clickable {
                         isContentsWithImagesOnly = !isContentsWithImagesOnly
                     },
-                    info = "사진 후기",
+                    text = "사진 후기",
                     iconResource = IconResource.Vector(Icons.Default.CameraAlt),
                     backgroundColor = Color.Transparent,
                     contentColor = if (isContentsWithImagesOnly) activatedChipColor else disabledChipColor,
@@ -472,7 +480,7 @@ private fun ReviewTab(reviews: ReviewList) {
                     modifier = Modifier.clickable {
                         isVerifiedContentsOnly = !isVerifiedContentsOnly
                     },
-                    info = "영수증 인증",
+                    text = "영수증 인증",
                     iconResource = IconResource.Vector(Icons.Default.Check),
                     backgroundColor = Color.Transparent,
                     contentColor = if (isVerifiedContentsOnly) activatedChipColor else disabledChipColor,
@@ -572,7 +580,7 @@ private fun ReviewCard(review: Review) {
             ) {
                 val animalCategory = review.detailAnimalType.split(">").firstOrNull()?.trim() ?: ""
                 ChipWithIcon(
-                    info = animalCategory,
+                    text = animalCategory,
                     iconResource = IconResource.Vector(Icons.Default.Check), // 아이콘은 적절히 변경 필요
                     backgroundColor = Color(0xFFFFF9E6),
                     contentColor = colorScheme.textSecondary,
